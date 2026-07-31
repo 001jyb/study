@@ -1,0 +1,1631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>学习网站 - 专升本备考</title>
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --card-hover: rgba(0,0,0,0.08);
+            --text: #333333;
+            --text-sub: #666666;
+            --text-mute: #999999;
+            --border: #e8e8e8;
+            --primary: #667eea;
+            --primary-dark: #5a6fd6;
+            --code-bg: #1a1b26;
+            --code-text: #c0caf5;
+            --shadow: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --transition: all 0.2s ease;
+        }
+        body.dark {
+            --bg: #16161e;
+            --card: #1f1f2b;
+            --card-hover: rgba(255,255,255,0.06);
+            --text: #e6e6ea;
+            --text-sub: #b8b8c0;
+            --text-mute: #888890;
+            --border: #2e2e3c;
+            --primary: #8b9cff;
+            --primary-dark: #7a8cf0;
+            --code-bg: #12121a;
+            --code-text: #c0caf5;
+            --shadow: 0 1px 4px rgba(0,0,0,0.3);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system,'Microsoft YaHei',sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; transition: background 0.3s, color 0.3s; }
+        header { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: white; padding: 40px 20px; text-align: center; }
+        header h1 { font-size: 28px; margin-bottom: 8px; }
+        header p { font-size: 14px; opacity: 0.85; }
+        .tabs { display: flex; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; overflow-x: auto; transition: background 0.3s; }
+        .tab-btn { padding: 14px 24px; border: none; background: none; font-size: 15px; cursor: pointer; color: var(--text-sub); white-space: nowrap; border-bottom: 3px solid transparent; transition: var(--transition); }
+        .tab-btn:hover { color: var(--primary); background: rgba(102,126,234,0.08); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        .note-card { background: var(--card); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); transition: box-shadow 0.2s, background 0.3s; }
+        .note-card:hover { box-shadow: var(--shadow-hover); }
+        .note-card h3 { font-size: 17px; color: var(--text); margin-bottom: 8px; padding-left: 12px; border-left: 4px solid var(--primary); }
+        .note-card .meta { font-size: 12px; color: var(--text-mute); margin-bottom: 10px; }
+        .note-card p { font-size: 14px; color: var(--text-sub); }
+        .note-card code { background: rgba(127,127,127,0.15); padding: 2px 6px; border-radius: 4px; font-size: 13px; color: #e74c3c; }
+        .note-card pre { background: var(--code-bg); color: var(--code-text); padding: 14px; border-radius: 8px; overflow-x: auto; font-size: 13px; margin: 10px 0; line-height: 1.6; }
+        .code-runner { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+        .code-runner textarea { width: 100%; height: 200px; font-family: 'Courier New',monospace; font-size: 13px; padding: 12px; border: 1px solid var(--border); border-radius: 6px; resize: vertical; background: var(--card); color: var(--text); }
+        .code-runner textarea:focus { outline: none; border-color: var(--primary); }
+        .btn { padding: 10px 24px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; margin: 8px 8px 8px 0; transition: var(--transition); }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-success:hover { background: #219a52; }
+        .tool-card p { font-size: 12px; color: var(--text-mute); }
+        .timer-display { font-size: 64px; font-weight: bold; text-align: center; color: var(--text); font-family: 'Courier New',monospace; margin: 16px 0; }
+        .sort-item:hover { background: #eef1ff !important; border-color: var(--primary) !important; }
+
+        /* Animations */
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes slideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes shake {
+            0%,100%{transform:translateX(0)}
+            20%{transform:translateX(-8px)}
+            40%{transform:translateX(8px)}
+            60%{transform:translateX(-6px)}
+            80%{transform:translateX(6px)}
+        }
+        .sort-item:active { cursor: grabbing !important; }
+
+        /* 暗色模式按钮 */
+        .theme-toggle {
+            position: fixed; right: 18px; bottom: 18px; z-index: 200;
+            width: 48px; height: 48px; border-radius: 50%; border: none; cursor: pointer;
+            background: linear-gradient(135deg,#667eea,#764ba2); color: white; font-size: 20px;
+            box-shadow: 0 4px 16px rgba(102,126,234,0.4); transition: var(--transition);
+        }
+        .theme-toggle:hover { transform: scale(1.1) rotate(15deg); }
+
+        /* 主页仪表盘 */
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 18px; }
+        .stat-card { background: var(--card); border-radius: var(--radius); padding: 16px; text-align: center; box-shadow: var(--shadow); transition: var(--transition); }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+        .stat-card .stat-num { font-size: 26px; font-weight: 700; color: var(--primary); }
+        .ds-ring-wrap { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; background: var(--card); border-radius: var(--radius); padding: 16px 20px; box-shadow: var(--shadow); }
+        .ds-ring { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; }
+        .ds-ring-inner { width: 56px; height: 56px; border-radius: 50%; background: var(--card); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--primary); }
+        .ds-ring-info { flex: 1; }
+        .ds-ring-info .t { font-size: 15px; font-weight: 600; color: var(--text); }
+        .ds-ring-info .s { font-size: 12px; color: var(--text-mute); margin-top: 2px; }
+        .stat-card .stat-label { font-size: 12px; color: var(--text-mute); margin-top: 2px; }
+
+        /* 打卡日历 */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 12px; }
+        .cal-day { display: flex; align-items: center; justify-content: center; font-size: 12px; border-radius: 8px; background: rgba(127,127,127,0.08); color: var(--text-mute); min-height: 34px; padding: 8px 0; }
+        @supports (aspect-ratio: 1) { .cal-day { aspect-ratio: 1; padding: 0; min-height: 0; } }
+        .cal-day.checked { background: linear-gradient(135deg,#f39c12,#e67e22); color: #fff; font-weight: 700; }
+        .cal-day.today { border: 2px solid var(--primary); }
+        .cal-day.empty { background: transparent; }
+
+        /* 复制按钮 */
+        .copy-btn {
+            position: absolute; top: 10px; right: 10px; z-index: 10;
+            padding: 4px 12px; border: none; border-radius: 6px; cursor: pointer;
+            background: rgba(255,255,255,0.12); color: #a9b1d6; font-size: 12px;
+            transition: var(--transition);
+        }
+        .copy-btn:hover { background: rgba(255,255,255,0.25); color: #fff; }
+        .code-wrap { position: relative; }
+
+        /* 难度选择卡片 */
+        .diff-card {
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .diff-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+        .diff-card .dc-icon { font-size: 40px; margin-bottom: 4px; }
+        .diff-card .dc-title { font-size: 20px; font-weight: 700; margin-bottom: 2px; }
+        .diff-card .dc-sub { font-size: 14px; opacity: 0.8; margin-bottom: 10px; }
+        .diff-card .dc-progress { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.3); margin-bottom: 8px; overflow: hidden; }
+        .diff-card .dc-progress-bar { height: 100%; border-radius: 3px; background: white; transition: width 0.5s; }
+        .diff-card .dc-stats { display: flex; justify-content: space-between; font-size: 13px; opacity: 0.85; }
+        .diff-card .dc-btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.6);
+            background: transparent;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .diff-card .dc-btn:hover { background: white; color: #333; }
+
+        /* 难度选择页面标题 */
+        .diff-header { font-size: 16px; color: #666; margin-bottom: 14px; text-align: center; }
+
+        /* 题目列表头部返回栏 */
+        .list-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        .list-header .back-btn {
+            padding: 6px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.2s;
+        }
+        .list-header .back-btn:hover { background: #f5f5f5; border-color: #667eea; color: #667eea; }
+        .list-header .lh-title { font-size: 18px; font-weight: 700; color: #333; flex: 1; }
+        .list-header .lh-count { font-size: 14px; color: #999; }
+
+        .timer-status { text-align: center; font-size: 14px; color: #999; margin-bottom: 12px; }
+        .todo-input { display: flex; gap: 8px; margin-bottom: 12px; }
+        .todo-input input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .todo-input input:focus { outline: none; border-color: #667eea; }
+        .todo-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+        .todo-item:last-child { border-bottom: none; }
+        .todo-item input[type=checkbox] { width: 18px; height: 18px; margin-right: 12px; cursor: pointer; }
+        .todo-item .text { flex: 1; font-size: 14px; }
+        .todo-item .text.done { text-decoration: line-through; color: #999; }
+        .todo-item .del-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 16px; padding: 4px 8px; }
+        select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        @media (max-width:600px) {
+            header { padding: 24px 16px; }
+            header h1 { font-size: 22px; }
+            .tab-btn { padding: 10px 14px; font-size: 13px; }
+            .container { padding: 12px; }
+            .timer-display { font-size: 48px; }
+            /* 手机端：练习区改单栏 */
+            .ex-body { flex-direction: column; min-height: auto; }
+            .ex-left { width: 100%; border-right: none; border-bottom: 1px solid #eef0f5; }
+            .ex-right { width: 100%; }
+            .ex-sort-area { min-height: 200px; }
+            .ex-code-line .cl-code { font-size: 12px; overflow-x: auto; }
+            .note-card { padding: 14px; }
+            .stat-card .stat-num { font-size: 22px; }
+            .ds-ring-wrap { flex-direction: column; text-align: center; }
+            .ds-ring-info { text-align: center; }
+            .theme-toggle { width: 40px; height: 40px; font-size: 17px; right: 12px; bottom: 12px; }
+            .calendar-grid { gap: 3px; }
+            .cal-day { font-size: 10px; }
+        }
+
+        /* ===== Exercise solving redesign ===== */
+        .ex-container {
+            background: white; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+            overflow: hidden; animation: slideUp 0.3s ease;
+        }
+        .ex-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px; background: #f8f9ff; border-bottom: 1px solid #eef0f5;
+        }
+        .ex-header .ex-num {
+            font-size: 14px; font-weight: 700; color: #667eea;
+            background: rgba(102,126,234,0.1); padding: 3px 10px; border-radius: 6px;
+        }
+        .ex-header .ex-title { font-size: 16px; font-weight: 600; color: #333; margin-left: 10px; }
+        .ex-header .ex-exit-btn {
+            padding: 5px 14px; border: 1px solid #e0e0e0; border-radius: 8px;
+            background: white; cursor: pointer; font-size: 12px; color: #999; transition: all 0.2s;
+        }
+        .ex-header .ex-exit-btn:hover { color: #e74c3c; border-color: #e74c3c; }
+        .ex-body { display: flex; min-height: 380px; }
+        .ex-left {
+            width: 34%; padding: 20px; background: #fafbff;
+            border-right: 1px solid #eef0f5;
+            display: flex; flex-direction: column; gap: 14px;
+        }
+        .ex-desc-box {
+            font-size: 13px; color: #555; line-height: 1.7;
+            background: white; padding: 12px 14px; border-radius: 10px;
+            border-left: 3px solid #667eea; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .ex-desc-box .ex-desc-label {
+            font-size: 11px; font-weight: 600; color: #667eea; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 4px;
+        }
+        .ex-progress-wrap { background: #e8ecf4; border-radius: 4px; height: 4px; overflow: hidden; }
+        .ex-progress-bar {
+            height: 100%; background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px; transition: width 0.4s ease;
+        }
+        .ex-stats {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0; border-top: 1px solid #eef0f5; margin-top: auto;
+        }
+        .ex-stats span { font-size: 12px; color: #999; }
+        .ex-stats .ex-xp { color: #667eea; font-weight: 600; }
+        .ex-right { flex: 1; padding: 16px; background: #f5f6fa; }
+        .ex-line-counter { font-size: 12px; color: #999; margin-bottom: 8px; padding-left: 4px; }
+        .ex-sort-area { min-height: 280px; display: flex; flex-direction: column; gap: 4px; }
+
+        .ex-code-line {
+            display: flex; align-items: center; gap: 0;
+            background: #1a1b26; border: 1px solid #2a2b3e;
+            border-radius: 8px; cursor: grab;
+            transition: all 0.2s ease; user-select: none; overflow: hidden;
+        }
+        .ex-code-line:hover { border-color: #667eea; box-shadow: 0 2px 8px rgba(102,126,234,0.2); }
+        .ex-code-line:active { cursor: grabbing; }
+        .ex-code-line.dragging { opacity: 0.6; box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        .ex-code-line .cl-gutter {
+            width: 32px; flex-shrink: 0; text-align: center;
+            font-size: 11px; font-family: 'Courier New', monospace;
+            color: #4a4b5e; padding: 10px 0;
+        }
+        .ex-code-line .cl-code {
+            flex: 1; padding: 10px 12px 10px 8px;
+            font-family: 'Courier New', 'Consolas', monospace;
+            font-size: 13px; color: #c0caf5; line-height: 1.5;
+            background: #1a1b26; border-left: 1px solid #2a2b3e;
+        }
+        .ex-code-line .cl-drag {
+            width: 24px; flex-shrink: 0; text-align: center;
+            color: #3b3c4e; font-size: 14px; cursor: grab; padding: 10px 4px;
+        }
+        .ex-code-line .cl-drag:hover { color: #667eea; }
+        .syn-kw { color: #bb9af7; }
+        .syn-str { color: #9ece6a; }
+        .syn-num { color: #ff9e64; }
+        .syn-fn { color: #7dcfff; }
+        .syn-builtin { color: #73daca; }
+
+        .ex-code-line.line-correct {
+            border-color: #27ae60 !important; background: #1d2d26 !important;
+            animation: lineCorrect 0.5s ease;
+        }
+        .ex-code-line.line-wrong {
+            border-color: #e74c3c !important; background: #2d1d1d !important;
+            animation: lineShake 0.4s ease;
+        }
+        @keyframes lineCorrect {
+            0% { box-shadow: 0 0 0 0 rgba(39,174,96,0.4); }
+            100% { box-shadow: 0 0 0 8px rgba(39,174,96,0); }
+        }
+        @keyframes lineShake {
+            0%,100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+
+        .ex-footer { display: flex; gap: 8px; padding: 14px 20px; background: white; border-top: 1px solid #eef0f5; }
+        .ex-btn { padding: 10px 24px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .ex-btn:active { transform: scale(0.97); }
+        .ex-btn-check { flex: 1; background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .ex-btn-check:hover { box-shadow: 0 4px 14px rgba(102,126,234,0.35); }
+        .ex-btn-hint { background: #eef0f5; color: #666; }
+        .ex-btn-hint:hover { background: #e0e2e8; color: #333; }
+        .ex-hint-area {
+            display: none; margin-top: 8px;
+            background: #1a1b26; border-radius: 10px; padding: 12px 14px;
+            font-size: 13px; line-height: 1.7; color: #c0caf5; border: 1px solid #2a2b3e;
+        }
+        .ex-msg { font-size: 13px; padding: 3px 20px 14px; min-height: 24px; }
+        .ex-msg.error { color: #e74c3c; }
+        .ex-msg.success { color: #27ae60; }
+    </style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="切换深浅色">🌙</button>
+<header>
+    <h1>📚 学习笔记</h1>
+    <p>记录 · 练习 · 成长</p>
+</header>
+<nav class="tabs" id="tabNav">
+    <button class="tab-btn active" data-tab="notes">📝 主页</button>
+    <button class="tab-btn" data-tab="python">🐍 Python练习</button>
+    <button class="tab-btn" data-tab="java">☕ Java练习</button>
+    <button class="tab-btn" data-tab="c">⚙️ C练习</button>
+    <button class="tab-btn" data-tab="vocab">📖 背单词</button>
+    <button class="tab-btn" data-tab="essays">✍️ 写作范文</button>
+    <button class="tab-btn" data-tab="ds">📚 数据结构</button>
+    <button class="tab-btn" data-tab="lanqiao">🏆 蓝桥杯</button>
+    <button class="tab-btn" data-tab="cheatsheet">📘 Java速查</button>
+    <button class="tab-btn" data-tab="tools">🛠 小工具</button>
+    <button class="tab-btn" data-tab="todo">✅ 待办</button>
+</nav>
+
+<div class="container">
+    <div class="tab-content active" id="tab-notes"><div id="noteList"></div></div>
+    <div class="tab-content" id="tab-python">
+    <div class="tab-content" id="tab-java"></div>
+    <div class="tab-content" id="tab-c"></div>
+        <div id="pyStatus" style="display:none;color:#e74c3c;font-size:13px;text-align:center;padding:10px;"></div>
+        <div class="note-card" style="padding:14px 20px;margin-bottom:12px;background:linear-gradient(135deg,#f8f9ff,#eef1ff);">
+            <div id="playerInfo">加载中...</div>
+            <div id="badgeArea" style="margin-top:8px;display:flex;gap:4px;"></div>
+        </div>
+        <div id="currentExercise"></div>
+        <div id="diffSelect"></div>
+        <div id="exList" style="display:none;"></div>
+    </div>
+    <div class="tab-content" id="tab-vocab">
+        <div class="note-card" style="padding:14px 20px;margin-bottom:12px;background:linear-gradient(135deg,#f8f9ff,#eef1ff);">
+            <div id="vocabInfo">加载中...</div>
+        </div>
+        <div id="vocabArea"></div>
+    </div>
+    <div class="tab-content" id="tab-essays">
+        <div class="note-card" style="padding:14px 20px;margin-bottom:12px;background:linear-gradient(135deg,#f8f9ff,#eef1ff);">
+            <div id="essayInfo">加载中...</div>
+        </div>
+        <div id="essayArea"></div>
+    </div>
+    <div class="tab-content" id="tab-lanqiao"></div>
+    <div class="tab-content" id="tab-cheatsheet">
+        <div class="note-card" style="padding:14px 20px;margin-bottom:12px;background:linear-gradient(135deg,#f8f9ff,#eef1ff);">
+            <div id="csInfo">加载中...</div>
+        </div>
+        <div id="csArea"></div>
+    </div>
+    <div class="tab-content" id="tab-ds">
+        <div class="note-card" style="padding:14px 20px;margin-bottom:12px;background:linear-gradient(135deg,#f8f9ff,#eef1ff);">
+            <div id="dsInfo">加载中...</div>
+        </div>
+        <div id="dsArea"></div>
+    </div>
+    <div class="tab-content" id="tab-tools">
+        <div class="tool-grid">
+            <div class="tool-card" onclick="switchTab('timer')"><div class="icon">🍅</div><h4>番茄钟</h4><p>25分钟专注学习</p></div>
+            <div class="tool-card" onclick="switchTab(\'todo\')"><div class="icon">✅</div><h4>待办清单</h4><p>记录学习任务</p></div>
+            <div class="tool-card" onclick="window.open('https://www.runoob.com','_blank')"><div class="icon">📖</div><h4>菜鸟教程</h4><p>在线学习资料</p></div>
+        </div>
+        <div id="timerSection" style="margin-top:20px;display:none;">
+            <div class="note-card">
+                <h3>🍅 番茄钟</h3>
+                <div class="timer-display" id="timerDisplay">25:00</div>
+                <div class="timer-status" id="timerStatus">点击开始专注学习</div>
+                <div style="text-align:center;">
+                    <button class="btn btn-primary" id="timerBtn" onclick="toggleTimer()">▶ 开始</button>
+                    <button class="btn btn-danger" onclick="resetTimer()">↺ 重置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-content" id="tab-todo">
+        <div class="note-card">
+            <h3>✅ 学习待办</h3>
+            <div class="todo-input">
+                <input type="text" id="todoInput" placeholder="输入学习任务..." onkeydown="if(event.key==='Enter') addTodo()">
+                <button class="btn btn-primary" onclick="addTodo()">添加</button>
+            </div>
+            <div id="todoList"></div>
+        </div>
+    </div>
+</div>
+
+<script src="python_exercises.js"></script>
+<script src="java_exercises.js"></script>
+<script src="c_exercises.js"></script>
+<script src="vocab_words.js"></script>
+<script src="essays.js"></script>
+<script src="ds_course.js"></script>
+<script src="lanqiao.js"></script>
+<script>var pyExercises = typeof exercises !== "undefined" ? exercises : [];</script>
+<script>
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            var t = this.dataset.tab;
+            window.curLang = (t === 'java' || t === 'c' || t === 'lanqiao') ? t : 'python';
+            if (t === 'java' || t === 'c' || t === 'lanqiao') {
+                document.getElementById('tab-python').classList.add('active');
+                if (t === 'java') { exercises = javaExercises; }
+                else if (t === 'c') { exercises = cExercises; }
+                else { exercises = lanqiaoExercises; }
+                if (t === 'lanqiao') { try{enterD('挑战')}catch(e){try{render()}catch(e){}} }
+                else { try{render()}catch(e){} }
+            } else {
+                document.getElementById('tab-' + t).classList.add('active');
+                if (t === 'python') { if(pyExercises && pyExercises.length > 0) { exercises = pyExercises; } try{render()}catch(e){} }
+            }
+        });
+    });
+    function switchTab(name) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelector('[data-tab="'+name+'"]').classList.add('active');
+        window.curLang = (name === 'java' || name === 'c' || name === 'lanqiao') ? name : 'python';
+        if (name === 'java' || name === 'c' || name === 'lanqiao') {
+            document.getElementById('tab-python').classList.add('active');
+            if (name === 'java') { exercises = javaExercises; }
+            else if (name === 'c') { exercises = cExercises; }
+            else { exercises = lanqiaoExercises; }
+            if (name === 'lanqiao') { try{enterD('挑战')}catch(e){try{render()}catch(e){}} }
+            else { try{render()}catch(e){} }
+        } else {
+            document.getElementById('tab-'+name).classList.add('active');
+            if (name === 'python') { if(pyExercises && pyExercises.length > 0) { exercises = pyExercises; } try{render()}catch(e){} }
+        }
+        if (name === 'timer') document.getElementById('timerSection').style.display = 'block';
+        if (name === 'vocab') { vocabInfo(); vHome(); }
+        if (name === 'cheatsheet') { csRender(); }
+    }
+    function resetGame() {
+        if (confirm('确定要重置所有练习进度吗？')) {
+            localStorage.removeItem('pg_python');
+            localStorage.removeItem('pg_java');
+            localStorage.removeItem('pg_c');
+            localStorage.removeItem('pg');
+            render();
+        }
+    }
+    function dsRingHtml() {
+        try {
+            var dp = JSON.parse(localStorage.getItem('ds_progress') || '{}');
+            var done = 0;
+            for (var i = 1; i <= 9; i++) {
+                var p = dp['ch' + i];
+                if (p && p.anim && p.sim && p.quiz) done++;
+            }
+            var pct = Math.round(done / 9 * 100);
+            var color = done >= 9 ? '#22c55e' : (done >= 5 ? '#f59e0b' : '#667eea');
+            return '<div class="ds-ring-wrap">'
+                + '<div class="ds-ring" style="background:conic-gradient(' + color + ' ' + pct + '%, var(--border) 0)">'
+                + '<div class="ds-ring-inner">' + done + '/9</div></div>'
+                + '<div class="ds-ring-info"><div class="t">📚 数据结构学习</div>'
+                + '<div class="s">' + (done >= 9 ? '🎉 全部通关！可以开始刷蓝桥杯真题了' : '已通关 ' + done + ' 章，继续加油！') + '</div>'
+                + '<div class="s" style="margin-top:4px"><button class="btn btn-primary" style="padding:4px 14px;font-size:12px;margin:0" onclick="switchTab(\'ds\')">去学习 →</button></div>'
+                + '</div></div>';
+        } catch (e) { return ''; }
+    }
+
+    function renderNotes() {
+  var el=document.getElementById('noteList');if(!el)return;
+  var now=new Date();
+  // 学习数据仪表盘
+  var vst = JSON.parse(localStorage.getItem('vocab_state') || 'null');
+  var vocabDone = vst && vst.done ? vst.done.length : 0;
+  var streak = vst && vst.streak ? vst.streak : 0;
+  var pg = JSON.parse(localStorage.getItem('pg_python') || 'null');
+  var pgj = JSON.parse(localStorage.getItem('pg_java') || 'null');
+  var pgc = JSON.parse(localStorage.getItem('pg_c') || 'null');
+  var exDone = (pg && pg.c ? pg.c.length : 0) + (pgj && pgj.c ? pgj.c.length : 0) + (pgc && pgc.c ? pgc.c.length : 0);
+  var todos = JSON.parse(localStorage.getItem('study_todos') || '[]');
+  var todoDone = todos.filter(function(t){return t.done;}).length;
+  el.innerHTML='<div style="text-align:center;padding:30px 20px 10px;animation:slideUp .4s ease">'
+    +'<div style="font-size:48px;margin-bottom:8px">📚</div>'
+    +'<h2 style="font-size:24px;color:var(--text);margin-bottom:6px">学习主页</h2>'
+    +"<p style='font-size:14px;color:var(--text-mute)'>"+now.getFullYear()+"年"+(now.getMonth()+1)+"月"+now.getDate()+"日 · 今天也要加油 ✨</p>"
+    +'</div>'
+    + dsRingHtml()
+    +'<div class="stat-grid">'
+    +'<div class="stat-card"><div class="stat-num">'+streak+'</div><div class="stat-label">🔥 连续打卡(天)</div></div>'
+    +'<div class="stat-card"><div class="stat-num">'+vocabDone+'</div><div class="stat-label">📖 已背单词</div></div>'
+    +'<div class="stat-card"><div class="stat-num">'+exDone+'</div><div class="stat-label">📝 练习完成</div></div>'
+    +'<div class="stat-card"><div class="stat-num">'+todoDone+'/'+todos.length+'</div><div class="stat-label">✅ 待办完成</div></div>'
+    +'</div>'
+    +'<div class="home-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:20px">'
+    +'<div class="hc" data-tab="python" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:24px;border-radius:16px;cursor:pointer;position:relative;overflow:hidden"><div style="font-size:36px;margin-bottom:8px">🐍</div><h3 style="font-size:18px;font-weight:700;margin-bottom:4px">Python 练习</h3><p style="font-size:13px;opacity:.85">100 入门 · 80 进阶 · 50 挑战</p><div style="position:absolute;right:-10px;bottom:-10px;font-size:80px;opacity:.06">🐍</div></div>'
+    +'<div class="hc" data-tab="java" style="background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;padding:24px;border-radius:16px;cursor:pointer;position:relative;overflow:hidden"><div style="font-size:36px;margin-bottom:8px">☕</div><h3 style="font-size:18px;font-weight:700;margin-bottom:4px">Java 练习</h3><p style="font-size:13px;opacity:.85">100 入门 · 80 进阶 · 50 挑战</p><div style="position:absolute;right:-10px;bottom:-10px;font-size:80px;opacity:.06">☕</div></div>'
+    +'<div class="hc" data-tab="c" style="background:linear-gradient(135deg,#2c3e50,#34495e);color:#fff;padding:24px;border-radius:16px;cursor:pointer;position:relative;overflow:hidden"><div style="font-size:36px;margin-bottom:8px">⚙️</div><h3 style="font-size:18px;font-weight:700;margin-bottom:4px">C 练习</h3><p style="font-size:13px;opacity:.85">100 入门 · 80 进阶 · 50 挑战</p><div style="position:absolute;right:-10px;bottom:-10px;font-size:80px;opacity:.06">⚙️</div></div>'
+    +'<div class="hc" data-tab="vocab" style="background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;padding:24px;border-radius:16px;cursor:pointer;position:relative;overflow:hidden"><div style="font-size:36px;margin-bottom:8px">📖</div><h3 style="font-size:18px;font-weight:700;margin-bottom:4px">背单词</h3><p style="font-size:13px;opacity:.85">每日20词 · 打卡学习</p><div style="position:absolute;right:-10px;bottom:-10px;font-size:80px;opacity:.06">📖</div></div>'
+    +'<div class="hc" data-tab="essays" style="background:linear-gradient(135deg,#8e44ad,#6c3483);color:#fff;padding:24px;border-radius:16px;cursor:pointer;position:relative;overflow:hidden"><div style="font-size:36px;margin-bottom:8px">✍️</div><h3 style="font-size:18px;font-weight:700;margin-bottom:4px">写作范文</h3><p style="font-size:13px;opacity:.85">命题作文 · 应用文 · 中英对照</p><div style="position:absolute;right:-10px;bottom:-10px;font-size:80px;opacity:.06">✍️</div></div>'
+    +'<div class="hc" data-tab="ds" style="background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;padding:24px;border-radius:16px;cursor:pointer;position:relative;overflow:hidden"><div style="font-size:36px;margin-bottom:8px">📚</div><h3 style="font-size:18px;font-weight:700;margin-bottom:4px">数据结构</h3><p style="font-size:13px;opacity:.85">动画学 · 动手练 · 定时复习</p><div style="position:absolute;right:-10px;bottom:-10px;font-size:80px;opacity:.06">📚</div></div>'
+    +'<div class="hc" data-tab="lanqiao" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:24px;border-radius:16px;cursor:pointer;position:relative;overflow:hidden"><div style="font-size:36px;margin-bottom:8px">🏆</div><h3 style="font-size:18px;font-weight:700;margin-bottom:4px">蓝桥杯真题</h3><p style="font-size:13px;opacity:.85">省赛风格题 · 拖拽排序练习</p><div style="position:absolute;right:-10px;bottom:-10px;font-size:80px;opacity:.06">🏆</div></div>'
+    +'<div class="hc" data-tab="cheatsheet" style="background:linear-gradient(135deg,#64748b,#475569);color:#fff;padding:24px;border-radius:16px;cursor:pointer;position:relative;overflow:hidden"><div style="font-size:36px;margin-bottom:8px">📘</div><h3 style="font-size:18px;font-weight:700;margin-bottom:4px">Java速查</h3><p style="font-size:13px;opacity:.85">比赛API速览 · 考前翻一遍</p><div style="position:absolute;right:-10px;bottom:-10px;font-size:80px;opacity:.06">📘</div></div>'
+    +'<div class="hc" data-tab="tools" style="background:linear-gradient(135deg,#00b4b4,#008a8a);color:#fff;padding:24px;border-radius:16px;cursor:pointer;position:relative;overflow:hidden"><div style="font-size:36px;margin-bottom:8px">🛠</div><h3 style="font-size:18px;font-weight:700;margin-bottom:4px">小工具</h3><p style="font-size:13px;opacity:.85">番茄钟 · 待办清单</p><div style="position:absolute;right:-10px;bottom:-10px;font-size:80px;opacity:.06">🛠</div></div>'
+    +'<div class="hc" data-tab="todo" style="background:linear-gradient(135deg,#27ae60,#219a52);color:#fff;padding:24px;border-radius:16px;cursor:pointer;position:relative;overflow:hidden"><div style="font-size:36px;margin-bottom:8px">✅</div><h3 style="font-size:18px;font-weight:700;margin-bottom:4px">待办清单</h3><p style="font-size:13px;opacity:.85">记录学习任务</p><div style="position:absolute;right:-10px;bottom:-10px;font-size:80px;opacity:.06">✅</div></div>'
+    +'</div>'
+    ;
+  // Card hover effects
+  el.querySelectorAll(".hc").forEach(function(c){
+    c.addEventListener("mouseenter",function(){this.style.transform="translateY(-4px)";this.style.boxShadow="0 8px 25px rgba(0,0,0,.2)"});
+    c.addEventListener("mouseleave",function(){this.style.transform="";this.style.boxShadow=""});
+    c.addEventListener("click",function(){switchTab(this.dataset.tab)});
+  });
+}
+    function toggleTheme() {
+        var body = document.body;
+        body.classList.toggle('dark');
+        var dark = body.classList.contains('dark');
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+        document.getElementById('themeToggle').textContent = dark ? '☀️' : '🌙';
+    }
+    (function () {
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark');
+            var btn = document.getElementById('themeToggle');
+            if (btn) btn.textContent = '☀️';
+        }
+    })();
+renderNotes();
+    let timerInterval = null, timeLeft = 25*60, isRunning = false;
+    function updateTimerDisplay() {
+        document.getElementById('timerDisplay').textContent =
+            String(Math.floor(timeLeft/60)).padStart(2,'0') + ':' + String(timeLeft%60).padStart(2,'0');
+    }
+    function toggleTimer() {
+        const btn = document.getElementById('timerBtn');
+        if (isRunning) {
+            clearInterval(timerInterval); isRunning = false;
+            btn.textContent = '▶ 继续'; document.getElementById('timerStatus').textContent = '⏸ 已暂停';
+        } else {
+            isRunning = true; btn.textContent = '⏸ 暂停';
+            document.getElementById('timerStatus').textContent = '🔥 专注学习中...';
+            timerInterval = setInterval(() => {
+                timeLeft--; updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval); isRunning = false;
+                    btn.textContent = '▶ 开始'; timeLeft = 25*60; updateTimerDisplay();
+                    document.getElementById('timerStatus').textContent = '🎉 时间到！休息一下吧';
+                }
+            }, 1000);
+        }
+    }
+    function resetTimer() {
+        clearInterval(timerInterval); isRunning = false; timeLeft = 25*60;
+        updateTimerDisplay(); document.getElementById('timerBtn').textContent = '▶ 开始';
+        document.getElementById('timerStatus').textContent = '点击开始专注学习';
+    }
+    let todos = JSON.parse(localStorage.getItem('study_todos') || '[]');
+    function saveTodos() { localStorage.setItem('study_todos', JSON.stringify(todos)); }
+    function addTodo() {
+        const input = document.getElementById('todoInput'), text = input.value.trim();
+        if (!text) return;
+        todos.push({text,done:false}); input.value = ''; saveTodos(); renderTodos();
+    }
+    function toggleTodo(i) { todos[i].done = !todos[i].done; saveTodos(); renderTodos(); }
+    function deleteTodo(i) { todos.splice(i,1); saveTodos(); renderTodos(); }
+    function renderTodos() {
+        const list = document.getElementById('todoList');
+        if (!todos.length) { list.innerHTML = '<p style="color:#999;text-align:center;padding:20px;">还没有任务，添加一个吧 ✨</p>'; return; }
+        list.innerHTML = todos.map((t,i) =>
+            '<div class="todo-item">'
+            +'<input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTodo('+i+')">'
+            +'<span class="text '+(t.done?'done':'')+'">'+t.text+'</span>'
+            +'<button class="del-btn" onclick="deleteTodo('+i+')">✕</button>'
+            +'</div>'
+        ).join('');
+    }
+    renderTodos();
+
+    /* ===== 背单词（每日20词 + 打卡） ===== */
+    var vWords = typeof vocabWords !== 'undefined' ? vocabWords : [];
+    var DAY_SIZE = 20;
+    function vToday() {
+        var d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    function vYesterday() {
+        var d = new Date();
+        d.setDate(d.getDate() - 1);
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    // 状态（兼容旧版 {done,wrong} 迁移）
+    var _oldState = JSON.parse(localStorage.getItem('vocab_state') || 'null');
+    var vState = _oldState && typeof _oldState.idx === 'number' ? _oldState : {
+        idx: 0, dayDate: '', dayDone: 0, done: (_oldState && _oldState.done) || [],
+        wrong: (_oldState && _oldState.wrong) || [], streak: 0, lastCheck: '', checkedToday: false, dayWords: null
+    };
+    var vQueue = [], vMode = 'flash', vDir = 'en2cn', vShowAns = false, vQuizIdx = 0, vQuizScore = 0, vQuizTotal = 0;
+
+    function vSave() { localStorage.setItem('vocab_state', JSON.stringify(vState)); }
+    function vShuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+    // 当天固定 20 个词：从未学过的词里随机抽，同一天内保持不变（不按字母序）
+    function vDayWords() {
+        var today = vToday();
+        if (vState.dayDate !== today) { vState.dayDate = today; vState.dayDone = 0; vState.checkedToday = false; vState.dayWords = null; }
+        if (vState.dayWords && vState.dayWords.length) return vState.dayWords;
+        var learned = {};
+        vState.done.concat(vState.wrong).forEach(function (w) { learned[w] = true; });
+        var pool = vWords.filter(function (w) { return !learned[w.word]; });
+        if (!pool.length) return [];
+        var picked = vShuffle(pool.slice()).slice(0, DAY_SIZE);
+        vState.dayWords = picked;
+        vSave();
+        return picked;
+    }
+    function vDayNeeds() { return vDayWords().length; }
+    function vAllDone() {
+        var learned = {};
+        vState.done.concat(vState.wrong).forEach(function (w) { learned[w] = true; });
+        return Object.keys(learned).length >= vWords.length;
+    }
+    function vLearnedCount() {
+        var learned = {};
+        vState.done.concat(vState.wrong).forEach(function (w) { learned[w] = true; });
+        return Object.keys(learned).length;
+    }
+
+    function vocabInfo() {
+        var el = document.getElementById('vocabInfo');
+        if (!el) return;
+        var day = vDayWords();
+        var today = vToday();
+        if (vState.dayDate !== today) { vState.dayDate = today; vState.dayDone = 0; vState.checkedToday = false; }
+        var pct = day.length ? Math.min(100, Math.round(vState.dayDone / day.length * 100)) : 100;
+        el.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'
+            + '<div><span style="font-size:20px">📖</span><span style="font-size:16px;font-weight:600;color:#667eea;margin-left:6px">每日背单词</span><span style="font-size:13px;color:#999;margin-left:8px">' + today + '</span></div>'
+            + '<div style="display:flex;gap:14px;font-size:13px;color:#888">'
+            + '<span>📅 今日 ' + Math.min(vState.dayDone, day.length) + '/' + day.length + '</span>'
+            + '<span>🔥 连续打卡 ' + vState.streak + ' 天</span>'
+            + '<span>📚 已学 ' + vLearnedCount() + '/' + vWords.length + '</span>'
+            + '</div>'
+            + '<div style="width:100%;background:#e8ecf4;border-radius:4px;height:6px;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#f39c12,#e67e22);border-radius:4px;transition:width .4s"></div></div>'
+            + '</div>';
+    }
+
+    function vHome() {
+        var el = document.getElementById('vocabArea');
+        if (!el) return;
+        vShowAns = false;
+        var day = vDayWords();
+        var today = vToday();
+        if (vState.dayDate !== today) { vState.dayDate = today; vState.dayDone = 0; vState.checkedToday = false; }
+        var canCheck = vState.dayDone >= day.length && day.length > 0;
+        var html = '';
+        if (vAllDone() && !day.length) {
+            html += '<div class="note-card" style="text-align:center;padding:40px 20px"><div style="font-size:56px">🏆</div>'
+                + '<h3 style="margin:14px 0 6px">全部词汇已学完！</h3><p style="color:#999;font-size:14px">共 ' + vWords.length + ' 词，太棒了</p>'
+                + '<button class="btn btn-primary" style="margin-top:16px" onclick="vRestart()">重新开始</button></div>';
+        } else {
+            // 打卡卡片
+            html += '<div class="note-card" style="text-align:center;padding:24px;background:linear-gradient(135deg,#fdf6ec,#fef9f0)">'
+                + '<div style="font-size:14px;color:#e67e22;font-weight:600">' + today + '</div>'
+                + '<div style="font-size:44px;margin:10px 0">' + (canCheck ? '✅' : '📖') + '</div>'
+                + '<div style="font-size:18px;font-weight:700;color:#333">' + (vAllDone() ? '今天任务已完成' : '今日任务：' + day.length + ' 个单词') + '</div>'
+                + '<div style="font-size:13px;color:#999;margin:8px 0 14px">已背 ' + Math.min(vState.dayDone, day.length) + ' / ' + day.length + (vState.checkedToday ? ' · 今日已打卡 ✅' : '') + '</div>'
+                + (canCheck && !vState.checkedToday
+                    ? '<button class="btn" style="background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;font-size:15px;padding:12px 32px" onclick="vCheckIn()">🔥 打卡学习</button>'
+                    : '<div style="font-size:12px;color:#bbb">' + (vState.checkedToday ? '明天再来，连续打卡 ' + (vState.streak + 1) + ' 天！' : '背完今天 20 个词即可打卡') + '</div>')
+                + '</div>'
+            // 打卡日历
+            html += '<div class="note-card"><h3 style="margin-bottom:4px">📅 本月打卡</h3><div id="vCalendar"></div></div>';
+            // 单词列表
+            html += '<div class="note-card"><h3 style="margin-bottom:10px">📋 今日单词</h3>';
+            for (var i = 0; i < day.length; i++) {
+                var w = day[i];
+                var mastered = vState.done.indexOf(w.word) >= 0;
+                html += '<div style="display:flex;align-items:center;padding:8px 4px;border-bottom:1px solid #f5f5f5">'
+                    + '<span style="width:34px;color:#ccc;font-size:12px">' + (i + 1) + '</span>'
+                    + '<span style="width:130px;font-weight:600;color:#333">' + esc(w.word) + '</span>'
+                    + '<span style="width:60px;font-size:12px;color:#999">' + esc(w.pos || '') + '</span>'
+                    + '<span style="flex:1;font-size:13px;color:#666">' + esc(w.meaning) + '</span>'
+                    + (mastered ? '<span style="color:#27ae60;font-size:12px">✓</span>' : '')
+                    + '</div>';
+            }
+            html += '</div>';
+            // 操作按钮
+            html += '<div style="display:flex;gap:10px;flex-wrap:wrap">'
+                + '<button class="btn btn-primary" onclick="vStart(\'mixed\')">✍️ 开始背诵</button>'
+                + '<button class="btn" style="background:#eef0f5" onclick="vStart(\'quiz\')">✏️ 自测今天</button>'
+                + '<button class="btn" style="background:#eef0f5" onclick="vStart(\'en2cn\')">✍️ 英译汉</button>'
+                + '<button class="btn" style="background:#eef0f5" onclick="vStart(\'cn2en\')">✍️ 汉译英</button>'
+                + '<button class="btn" style="background:#eef0f5" onclick="vStart(\'review\')">🔁 错词复习 (' + vState.wrong.length + ')</button>'
+                + '<button class="btn" style="background:#eef0f5" onclick="vLib()">📚 浏览词库</button>'
+                + '</div>';
+        }
+        el.innerHTML = html;
+        if (document.getElementById('vCalendar')) vCalendar();
+    }
+
+    function vStart(mode) {
+        vMode = mode;
+        if (mode === 'review') {
+            var wrongWords = vWords.filter(function (w) { return vState.wrong.indexOf(w.word) >= 0; });
+            if (!wrongWords.length) { alert('太棒了，目前没有错词！🎉'); return; }
+            vQueue = vShuffle(wrongWords.slice());
+        } else if (mode === 'quiz' || mode === 'en2cn' || mode === 'cn2en' || mode === 'mixed') {
+            var dayWords = vDayWords();
+            if (!dayWords.length) { alert('今天的单词都背完了，明天再来吧！'); return; }
+            vQueue = vShuffle(dayWords.slice());
+        } else {
+            var dayWords2 = vDayWords();
+            if (!dayWords2.length) { alert('今天的单词都背完了，明天再来吧！'); return; }
+            vQueue = vShuffle(dayWords2.slice());
+        }
+        vIdx = 0; vShowAns = false; vQuizIdx = 0; vQuizScore = 0; vQuizTotal = 0;
+        if (mode === 'quiz') { vQuiz(); } else { vWrite(); }
+    }
+
+    // 英译汉 / 汉译英 输入题：一个单词多个意思，只要答对其中一个就算对
+    function vNormMeaning(meaning) {
+        // 按数字序号/逗号/分号/换行拆出所有义项，去掉序号前缀和括号注释
+        var parts = String(meaning || '').split(/[\d、\uFF0C,;；\n]+/);
+        var out = [];
+        for (var i = 0; i < parts.length; i++) {
+            var p = parts[i]
+                .replace(/^[\\.\s\uFF08(\uFF09)]+/, '')
+                .replace(/[\\.\s\uFF08(\uFF09)]+$/, '')
+                .trim();
+            if (!p) continue;
+            out.push(p);
+        }
+        return out;
+    }
+
+    function vWrite() {
+        var el = document.getElementById('vocabArea');
+        if (!el) return;
+        if (vIdx >= vQueue.length) {
+            var pct = vQuizTotal ? Math.round(vQuizScore / vQuizTotal * 100) : 100;
+            var doneTitle = vMode === 'mixed' ? '中英互填' : (vMode === 'en2cn' ? '英译汉' : (vMode === 'review' ? '错词复习' : '汉译英'));
+            // 完成当天的背诵（mixed/review/en2cn/cn2en）后标记 dayDone，允许打卡
+            if (vMode !== 'review' && vState.dayDone < vDayWords().length) {
+                vState.dayDone = vDayWords().length;
+                vSave(); vocabInfo();
+            }
+            el.innerHTML = '<div style="text-align:center;padding:50px 20px"><div style="font-size:56px">' + (pct >= 80 ? '🏆' : pct >= 50 ? '💪' : '📚') + '</div>'
+                + '<h3 style="margin:14px 0 6px">' + doneTitle + '完成！</h3>'
+                + '<p style="font-size:15px;color:#666">答对 ' + vQuizScore + ' / ' + vQuizTotal + '（' + pct + '%）</p>'
+                + '<button class="btn btn-primary" style="margin-top:16px" onclick="vHome()">返回打卡</button>'
+                + '<button class="btn" onclick="vStart(\'' + vMode + '\')">再来一轮</button></div>';
+            return;
+        }
+        var w = vQueue[vIdx];
+        // mixed 和 review 模式：每题随机决定是给英文填中文，还是给中文填英文
+        if (vMode === 'mixed' || vMode === 'review') {
+            vDir = Math.random() < 0.5 ? 'en2cn' : 'cn2en';
+        } else {
+            vDir = vMode;
+        }
+        var title = vDir === 'en2cn' ? esc(w.word) + (w.pos ? ' <span style="font-size:13px;color:#999">' + esc(w.pos) + '</span>' : '') : esc(w.meaning);
+        var ph = vDir === 'en2cn' ? '输入中文翻译（多个意思答对一个即可）' : '输入英文单词';
+        el.innerHTML = '<div style="text-align:center;padding:20px">'
+            + '<div style="font-size:13px;color:#999;margin-bottom:10px">' + (vIdx + 1) + ' / ' + vQueue.length + ' · ' + (vDir === 'en2cn' ? '看英文写中文' : '看中文写英文') + '</div>'
+            + '<div class="note-card" style="min-height:100px;display:flex;flex-direction:column;justify-content:center;align-items:center">'
+            + '<div style="font-size:30px;font-weight:700;color:#333">' + title + '</div></div>'
+            + '<div style="margin-top:16px">'
+            + '<input id="vWriteInput" type="text" placeholder="' + ph + '" style="width:80%;max-width:420px;padding:12px 16px;border:1px solid #ddd;border-radius:8px;font-size:16px;outline:none" onkeydown="if(event.key===\'Enter\')vWriteSubmit()" autocomplete="off">'
+            + '</div>'
+            + '<div style="margin-top:12px">'
+            + '<button class="btn btn-primary" onclick="vWriteSubmit()">✓ 提交</button>'
+            + '<button class="btn" style="background:#eef0f5" onclick="vWriteSkip()">跳过</button>'
+            + '</div>'
+            + '<div id="vWriteMsg" style="min-height:60px;margin-top:12px;font-size:14px;line-height:1.8"></div></div>';
+        var input = document.getElementById('vWriteInput');
+        if (input) input.focus();
+    }
+
+    function vWriteSubmit() {
+        var el = document.getElementById('vWriteInput');
+        if (!el) return;
+        var answer = el.value.trim();
+        if (!answer) return;
+        var w = vQueue[vIdx];
+        var msg = document.getElementById('vWriteMsg');
+        if (!msg) return;
+        vQuizTotal++;
+        var ok = false;
+        if (vDir === 'en2cn') {
+            // 中文答案：拆义项，任一命中即对（支持部分匹配，长度>=2）
+            var items = vNormMeaning(w.meaning);
+            for (var i = 0; i < items.length; i++) {
+                var it = items[i];
+                if (it.length >= 2 && (answer.indexOf(it) >= 0 || it.indexOf(answer) >= 0)) { ok = true; break; }
+            }
+            if (!ok && items.length === 0 && w.meaning && answer.indexOf(w.meaning) >= 0) ok = true;
+        } else {
+            // 英文答案：忽略大小写比较单词本身
+            ok = answer.toLowerCase() === String(w.word).toLowerCase();
+        }
+        if (ok) {
+            vQuizScore++;
+            var di = vState.done.indexOf(w.word), wi = vState.wrong.indexOf(w.word);
+            if (di < 0) vState.done.push(w.word);
+            if (wi >= 0) vState.wrong.splice(wi, 1);
+            msg.innerHTML = '<span style="color:#27ae60">✅ 正确！</span>';
+        } else {
+            var wi2 = vState.wrong.indexOf(w.word);
+            if (wi2 < 0) vState.wrong.push(w.word);
+            var di2 = vState.done.indexOf(w.word);
+            if (di2 >= 0) vState.done.splice(di2, 1);
+            msg.innerHTML = '<span style="color:#e74c3c">❌ 正确答案：</span>'
+                + '<div style="margin-top:6px;background:#f5f5f5;border-radius:8px;padding:10px;font-size:14px;color:#555">'
+                + '<b style="color:#333">' + esc(w.word) + '</b> ' + esc(w.pos || '') + '<br>' + esc(w.meaning) + '</div>';
+        }
+        vSave(); vocabInfo();
+        setTimeout(function () { vIdx++; vWrite(); }, 1400);
+    }
+
+    function vWriteSkip() {
+        var w = vQueue[vIdx];
+        var msg = document.getElementById('vWriteMsg');
+        vQuizTotal++;
+        if (msg) {
+            msg.innerHTML = '<span style="color:#e67e22">⏭ 已跳过，正确答案：</span>'
+                + '<div style="margin-top:6px;background:#f5f5f5;border-radius:8px;padding:10px;font-size:14px;color:#555">'
+                + '<b style="color:#333">' + esc(w.word) + '</b> ' + esc(w.pos || '') + '<br>' + esc(w.meaning) + '</div>';
+        }
+        var wi2 = vState.wrong.indexOf(w.word);
+        if (wi2 < 0) vState.wrong.push(w.word);
+        var di2 = vState.done.indexOf(w.word);
+        if (di2 >= 0) vState.done.splice(di2, 1);
+        vSave(); vocabInfo();
+        setTimeout(function () { vIdx++; vWrite(); }, 1400);
+    }
+
+    function vQuiz() {
+        var el = document.getElementById('vocabArea');
+        if (!el) return;
+        if (vQuizIdx >= vQueue.length) {
+            var pct = vQuizTotal ? Math.round(vQuizScore / vQuizTotal * 100) : 100;
+            el.innerHTML = '<div style="text-align:center;padding:50px 20px"><div style="font-size:56px">' + (pct >= 80 ? '🏆' : pct >= 50 ? '💪' : '📚') + '</div>'
+                + '<h3 style="margin:14px 0 6px">自测完成！</h3>'
+                + '<p style="font-size:15px;color:#666">答对 ' + vQuizScore + ' / ' + vQuizTotal + '（' + pct + '%）</p>'
+                + '<button class="btn btn-primary" style="margin-top:16px" onclick="vStart(\'quiz\')">再来一轮</button>'
+                + '<button class="btn" onclick="vHome()">返回</button></div>';
+            return;
+        }
+        var w = vQueue[vQuizIdx];
+        var opts = [w];
+        while (opts.length < 4) {
+            var cand = vWords[Math.floor(Math.random() * vWords.length)];
+            if (opts.indexOf(cand) < 0) opts.push(cand);
+        }
+        opts = vShuffle(opts);
+        var html = '<div style="text-align:center;padding:20px">'
+            + '<div style="font-size:13px;color:#999;margin-bottom:10px">' + (vQuizIdx + 1) + ' / ' + vQueue.length + ' · 请选出对应的单词</div>'
+            + '<div class="note-card" style="min-height:110px;display:flex;flex-direction:column;justify-content:center;align-items:center">'
+            + '<div style="font-size:18px;color:#555;max-width:520px">' + esc(w.meaning) + '</div>'
+            + '<div style="font-size:13px;color:#999;margin-top:8px">' + esc(w.pos || '') + '</div></div>'
+            + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">';
+        for (var i = 0; i < opts.length; i++) {
+            html += '<button class="btn" style="font-size:16px;padding:14px;margin:0" onclick="vAnswer(\'' + opts[i].word.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + '\', this)">' + esc(opts[i].word) + '</button>';
+        }
+        html += '</div><div id="vQuizMsg" style="min-height:28px;margin-top:10px;font-size:14px"></div></div>';
+        el.innerHTML = html;
+    }
+
+    function vAnswer(word, btn) {
+        var w = vQueue[vQuizIdx];
+        var msg = document.getElementById('vQuizMsg');
+        if (!msg) return;
+        vQuizTotal++;
+        var all = btn.parentNode.querySelectorAll('button');
+        if (word === w.word) {
+            vQuizScore++;
+            var di = vState.done.indexOf(w.word), wi = vState.wrong.indexOf(w.word);
+            if (di < 0) vState.done.push(w.word);
+            if (wi >= 0) vState.wrong.splice(wi, 1);
+            btn.style.background = '#27ae60'; btn.style.color = '#fff';
+            msg.innerHTML = '<span style="color:#27ae60">✅ 正确！</span>';
+        } else {
+            var wi2 = vState.wrong.indexOf(w.word);
+            if (wi2 < 0) vState.wrong.push(w.word);
+            var di2 = vState.done.indexOf(w.word);
+            if (di2 >= 0) vState.done.splice(di2, 1);
+            btn.style.background = '#e74c3c'; btn.style.color = '#fff';
+            for (var i = 0; i < all.length; i++) if (all[i].textContent === w.word) { all[i].style.background = '#27ae60'; all[i].style.color = '#fff'; }
+            msg.innerHTML = '<span style="color:#e74c3c">❌ 正确答案: <b>' + esc(w.word) + '</b></span>';
+        }
+        vSave(); vocabInfo();
+        setTimeout(function () { vQuizIdx++; vQuiz(); }, 1200);
+    }
+
+    // 本月打卡日历
+    function vCalendar() {
+        var el = document.getElementById('vCalendar');
+        if (!el) return;
+        var now = new Date();
+        var year = now.getFullYear(), month = now.getMonth();
+        var firstDay = new Date(year, month, 1).getDay();
+        var daysInMonth = new Date(year, month + 1, 0).getDate();
+        var todayNum = now.getDate();
+        // 收集本月已打卡的日期：从 lastCheck 反推（只精确知道最近打卡，这里用 streak 辅助展示）
+        var checked = {};
+        if (vState.lastCheck) {
+            var d = new Date(vState.lastCheck + 'T00:00:00');
+            for (var i = 0; i < vState.streak; i++) {
+                var key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+                if (d.getFullYear() === year && d.getMonth() === month) checked[key] = true;
+                d.setDate(d.getDate() - 1);
+            }
+        }
+        var weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+        var html = '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:11px;color:var(--text-mute);text-align:center;margin-top:8px">';
+        for (var w = 0; w < 7; w++) html += '<div>' + weekdays[w] + '</div>';
+        html += '</div><div class="calendar-grid">';
+        for (var i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
+        for (var day = 1; day <= daysInMonth; day++) {
+            var key2 = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+            var cls = 'cal-day';
+            if (checked[key2]) cls += ' checked';
+            if (day === todayNum) cls += ' today';
+            html += '<div class="' + cls + '">' + day + '</div>';
+        }
+        html += '</div>';
+        el.innerHTML = html;
+    }
+
+    function vCheckIn() {
+        var day = vDayWords();
+        if (vState.dayDone < day.length) { alert('今天还没背完 ' + day.length + ' 个词，背完才能打卡哦！'); return; }
+        if (vState.checkedToday) { alert('今天已经打过卡啦，明天再来！'); return; }
+        if (vState.lastCheck === vYesterday()) { vState.streak++; } else { vState.streak = 1; }
+        vState.lastCheck = vToday();
+        vState.checkedToday = true;
+        // 打卡成功：推进到下一组 20 词（学完的就不重复了）
+        vState.idx = Math.min(vState.idx + DAY_SIZE, vWords.length);
+        vSave(); vocabInfo(); vHome();
+        alert('🎉 打卡成功！连续打卡 ' + vState.streak + ' 天，明天继续！');
+    }
+
+    function vRestart() { vState.idx = 0; vState.dayDate = ''; vState.dayDone = 0; vState.checkedToday = false; vState.dayWords = null; vState.done = []; vState.wrong = []; vSave(); vocabInfo(); vHome(); }
+
+    function vReset() {
+        if (confirm('确定要清空背单词全部进度吗？')) {
+            vState = { idx: 0, dayDate: '', dayDone: 0, done: [], wrong: [], streak: 0, lastCheck: '', checkedToday: false, dayWords: null };
+            vSave(); vocabInfo(); vHome();
+        }
+    }
+
+    // ===== 词库浏览 =====
+    var vLibPage = 0, vLibPer = 50, vLibQ = '', vLibPos = '';
+    function vLib() {
+        var el = document.getElementById('vocabArea');
+        if (!el) return;
+        vLibPage = 0;
+        var html = '<div class="note-card">'
+            + '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">'
+            + '<button class="btn" style="background:#eef0f5;margin:0" onclick="vHome()">← 返回</button>'
+            + '<input id="vLibSearch" type="text" placeholder="🔍 搜索单词/释义..." value="' + esc(vLibQ) + '" style="flex:1;min-width:160px;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:16px;outline:none" oninput="vLibQ=this.value;vLibPage=0;vLibRender()">'
+            + '<select id="vLibPos" style="padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px" onchange="vLibPos=this.value;vLibPage=0;vLibRender()">'
+            + '<option value="">全部词性</option>'
+            + '<option value="n." ' + (vLibPos === 'n.' ? 'selected' : '') + '>名词 n.</option>'
+            + '<option value="v." ' + (vLibPos === 'v.' ? 'selected' : '') + '>动词 v.</option>'
+            + '<option value="adj." ' + (vLibPos === 'adj.' ? 'selected' : '') + '>形容词 adj.</option>'
+            + '<option value="adv." ' + (vLibPos === 'adv.' ? 'selected' : '') + '>副词 adv.</option>'
+            + '<option value="prep." ' + (vLibPos === 'prep.' ? 'selected' : '') + '>介词 prep.</option>'
+            + '<option value="conj." ' + (vLibPos === 'conj.' ? 'selected' : '') + '>连词 conj.</option>'
+            + '<option value="pron." ' + (vLibPos === 'pron.' ? 'selected' : '') + '>代词 pron.</option>'
+            + '<option value="art." ' + (vLibPos === 'art.' ? 'selected' : '') + '>冠词 art.</option>'
+            + '</select>'
+            + '</div>'
+            + '<div id="vLibBody"></div>'
+            + '</div>';
+        el.innerHTML = html;
+        vLibRender();
+    }
+
+    function vLibRender() {
+        var body = document.getElementById('vLibBody');
+        if (!body) return;
+        var q = (vLibQ || '').trim().toLowerCase();
+        var list = vWords.filter(function (w) {
+            if (vLibPos && w.pos !== vLibPos) return false;
+            if (q && w.word.toLowerCase().indexOf(q) < 0 && (w.meaning || '').indexOf(q) < 0 && (w.pos || '').toLowerCase().indexOf(q) < 0) return false;
+            return true;
+        });
+        var total = list.length, pages = Math.max(1, Math.ceil(total / vLibPer));
+        if (vLibPage >= pages) vLibPage = pages - 1;
+        var start = vLibPage * vLibPer, slice = list.slice(start, start + vLibPer);
+        var html = '<div style="font-size:12px;color:#999;margin-bottom:8px">共 ' + total + ' 个单词 · 第 ' + (vLibPage + 1) + '/' + pages + ' 页</div>';
+        for (var i = 0; i < slice.length; i++) {
+            var w = slice[i];
+            var mastered = vState.done.indexOf(w.word) >= 0;
+            var wrong = vState.wrong.indexOf(w.word) >= 0;
+            html += '<div style="display:flex;align-items:center;padding:8px 4px;border-bottom:1px solid #f5f5f5">'
+                + '<span style="width:130px;font-weight:600;color:#333">' + esc(w.word) + '</span>'
+                + '<span style="width:60px;font-size:12px;color:#999">' + esc(w.pos || '') + '</span>'
+                + '<span style="flex:1;font-size:13px;color:#666">' + esc(w.meaning) + '</span>'
+                + (mastered ? '<span style="color:#27ae60;font-size:12px" title="已掌握">✓</span>' : wrong ? '<span style="color:#e74c3c;font-size:12px" title="待复习">✗</span>' : '')
+                + '</div>';
+        }
+        if (!slice.length) html += '<div style="text-align:center;color:#999;padding:30px">没有匹配的单词</div>';
+        html += '<div style="display:flex;justify-content:center;gap:8px;margin-top:14px">'
+            + '<button class="btn" style="background:#eef0f5;margin:0" onclick="vLibPage--;vLibRender()" ' + (vLibPage <= 0 ? 'disabled' : '') + '>上一页</button>'
+            + '<button class="btn" style="background:#eef0f5;margin:0" onclick="vLibPage++;vLibRender()" ' + (vLibPage >= pages - 1 ? 'disabled' : '') + '>下一页</button>'
+            + '</div>';
+        body.innerHTML = html;
+    }
+
+    function esc(s) {
+        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    document.addEventListener('click', function (e) {
+        if (e.target.closest && e.target.closest('[data-tab="vocab"]')) {
+            vocabInfo(); vHome();
+        }
+    });
+
+    /* ===== 写作范文 ===== */
+    var eData = typeof essays !== 'undefined' ? essays : [];
+    var eFilter = { year: '全部', type: '全部' };
+
+    function eYears() {
+        var set = {};
+        eData.forEach(function (e) { set[e.year] = 1; });
+        return Object.keys(set).sort(function (a, b) { return b - a; });
+    }
+    function eTypes() {
+        var set = {};
+        eData.forEach(function (e) { set[e.type] = 1; });
+        return Object.keys(set);
+    }
+
+    function eInfo() {
+        var el = document.getElementById('essayInfo');
+        if (!el) return;
+        el.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'
+            + '<div><span style="font-size:20px">✍️</span><span style="font-size:16px;font-weight:600;color:#667eea;margin-left:6px">英语命题作文与应用文</span>'
+            + '<span style="font-size:13px;color:#999;margin-left:8px">共 ' + eData.length + ' 篇 · 中英对照</span></div>'
+            + '<div style="display:flex;gap:8px;font-size:13px">'
+            + '<select id="eYearSel" onchange="eFilter.year=this.value;eList()">'
+            + '<option value="全部">全部年份</option>'
+            + eYears().map(function (y) { return '<option value="' + y + '">' + y + '年</option>'; }).join('')
+            + '</select>'
+            + '<select id="eTypeSel" onchange="eFilter.type=this.value;eList()">'
+            + '<option value="全部">全部类型</option>'
+            + eTypes().map(function (t) { return '<option value="' + t + '">' + t + '</option>'; }).join('')
+            + '</select>'
+            + '</div></div>';
+    }
+
+    function eRender() {
+        eInfo();
+        eList();
+    }
+
+    function eList() {
+        var el = document.getElementById('essayArea');
+        if (!el) return;
+        var list = eData.filter(function (e) {
+            return (eFilter.year === '全部' || e.year === eFilter.year) && (eFilter.type === '全部' || e.type === eFilter.type);
+        });
+        if (!list.length) {
+            el.innerHTML = '<p style="text-align:center;color:#999;padding:40px">没有符合条件的范文</p>';
+            return;
+        }
+        el.innerHTML = list.map(function (e) {
+            return '<div class="note-card" style="cursor:pointer" onclick="eDetail(' + e.id + ')">'
+                + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+                + '<span style="font-size:12px;background:#667eea;color:#fff;padding:2px 8px;border-radius:10px">' + e.year + '年</span>'
+                + '<span style="font-size:12px;background:#eef0f5;color:#666;padding:2px 8px;border-radius:10px">' + e.type + '</span>'
+                + '<span style="font-size:12px;color:#999;margin-left:auto">点击查看 →</span>'
+                + '</div>'
+                + '<h3 style="font-size:15px;color:#333">' + esc(e.title) + '</h3>'
+                + '<p style="font-size:12px;color:#999;margin-top:4px">' + esc(e.prompt_cn || e.prompt).slice(0, 60) + '...</p>'
+                + '</div>';
+        }).join('');
+    }
+
+    function eDetail(id) {
+        var el = document.getElementById('essayArea');
+        var e = eData.find(function (x) { return x.id === id; });
+        if (!e || !el) return;
+        var html = '<div style="margin-bottom:12px"><button class="btn" style="background:#eef0f5" onclick="eList()">← 返回列表</button></div>'
+            + '<div class="note-card">'
+            + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+            + '<span style="font-size:12px;background:#667eea;color:#fff;padding:2px 8px;border-radius:10px">' + e.year + '年</span>'
+            + '<span style="font-size:12px;background:#eef0f5;color:#666;padding:2px 8px;border-radius:10px">' + e.type + '</span>'
+            + '</div>'
+            + '<h3 style="font-size:17px;color:#333;margin-bottom:10px">' + esc(e.title) + '</h3>'
+            + '<div style="background:#f8f9ff;border-left:3px solid #667eea;padding:12px 14px;border-radius:8px;font-size:13px;color:#555;line-height:1.8">'
+            + '<div style="font-size:11px;font-weight:600;color:#667eea;margin-bottom:4px">📝 题目要求（EN）</div>' + esc(e.prompt) + '</div>'
+            + '<div style="background:#fef9f0;border-left:3px solid #e67e22;padding:12px 14px;border-radius:8px;font-size:13px;color:#555;line-height:1.8;margin-top:8px">'
+            + '<div style="font-size:11px;font-weight:600;color:#e67e22;margin-bottom:4px">📝 题目要求（中文）</div>' + esc(e.prompt_cn || e.prompt) + '</div>'
+            + '</div>';
+        html += '<div class="note-card">'
+            + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+            + '<h3 style="font-size:15px;color:#333">✍️ 范文</h3>'
+            + '<button class="btn" style="background:#eef0f5;font-size:12px;padding:6px 14px" onclick="eToggle(this)">🙈 先练习（隐藏范文）</button>'
+            + '</div>'
+            + '<div id="eEssayBody">'
+            + '<div style="background:#1a1b26;color:#c0caf5;padding:14px 16px;border-radius:8px;font-size:13px;line-height:1.9;white-space:pre-wrap">' + esc(e.essay) + '</div>'
+            + '<div style="margin-top:10px;color:#555;font-size:13px;line-height:1.9;white-space:pre-wrap;background:#fafafa;padding:14px 16px;border-radius:8px"><b>中文翻译：</b><br>' + esc(e.essay_cn || '') + '</div>'
+            + '</div>'
+            + '</div>'
+            + '<div class="note-card">'
+            + '<h3 style="font-size:15px;color:#333;margin-bottom:8px">💡 写作要点</h3>'
+            + '<ul style="padding-left:20px;font-size:13px;color:#555;line-height:2">'
+            + e.points.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('')
+            + '</ul></div>';
+        el.innerHTML = html;
+    }
+
+    function eToggle(btn) {
+        var body = document.getElementById('eEssayBody');
+        if (!body) return;
+        var hidden = body.style.display === 'none';
+        body.style.display = hidden ? 'block' : 'none';
+        btn.textContent = hidden ? '🙈 先练习（隐藏范文）' : '👀 显示范文';
+    }
+
+    document.addEventListener('click', function (e) {
+        if (e.target.closest && e.target.closest('[data-tab="essays"]')) {
+            eRender();
+        }
+    });
+
+    /* ===== 数据结构学习 ===== */
+    var dsData = typeof dsChapters !== 'undefined' ? dsChapters : [];
+    var dsProg = JSON.parse(localStorage.getItem('ds_progress') || '{"ch1":{"anim":false,"sim":false,"quiz":false,"reviews":{}}}');
+
+    function dsSave() { localStorage.setItem('ds_progress', JSON.stringify(dsProg)); }
+
+    function dsInfo() {
+        var el = document.getElementById('dsInfo');
+        if (!el) return;
+        var done = 0;
+        dsData.forEach(function (c) {
+            var p = dsProg['ch' + c.id];
+            if (p && p.anim && p.sim && p.quiz) done++;
+        });
+        el.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'
+            + '<div><span style="font-size:20px">📚</span><span style="font-size:16px;font-weight:600;color:#667eea;margin-left:6px">数据结构学习</span>'
+            + '<span style="font-size:13px;color:#999;margin-left:8px">' + done + '/' + dsData.length + ' 章通关 · 先学再练</span></div>'
+            + '<div style="font-size:13px;color:#888">📅 复习队列: ' + dsReviewCount() + ' 项</div></div>';
+    }
+
+    function dsReviewCount() {
+        var n = 0, now = Date.now();
+        Object.keys(dsProg).forEach(function (k) {
+            var p = dsProg[k];
+            if (p && p.reviews) {
+                Object.keys(p.reviews).forEach(function (day) {
+                    var r = p.reviews[day];
+                    if (r && r.due && !r.done && r.due <= now) n++;
+                });
+            }
+        });
+        return n;
+    }
+
+    function dsRender() { dsInfo(); dsList(); }
+
+    function dsList() {
+        var el = document.getElementById('dsArea');
+        if (!el) return;
+        el.innerHTML = dsData.map(function (c) {
+            var p = dsProg['ch' + c.id] || {};
+            var parts = ['anim', 'sim', 'quiz'];
+            var doneParts = parts.filter(function (x) { return p[x]; }).length;
+            var unlocked = c.id === 1 || (dsProg['ch' + (c.id - 1)] && dsProg['ch' + (c.id - 1)].quiz);
+            return '<div class="note-card" style="cursor:' + (unlocked ? 'pointer' : 'not-allowed') + ';opacity:' + (unlocked ? '1' : '0.55') + '" onclick="' + (unlocked ? 'dsChapter(' + c.id + ')' : 'dsLocked()') + '">'
+                + '<div style="display:flex;align-items:center;gap:10px">'
+                + '<div style="font-size:32px">' + (unlocked ? c.icon : '🔒') + '</div>'
+                + '<div style="flex:1">'
+                + '<h3 style="font-size:16px;color:var(--text);margin-bottom:2px">第' + c.id + '章 · ' + c.title + '</h3>'
+                + '<p style="font-size:12px;color:var(--text-mute)">' + c.desc + '</p>'
+                + '</div>'
+                + (unlocked ? '<div style="text-align:right;font-size:12px;color:#667eea">'
+                    + '<div>📖 ' + (p.anim ? '✓' : '○') + ' 🖐 ' + (p.sim ? '✓' : '○') + ' ✅ ' + (p.quiz ? '✓' : '○') + '</div>'
+                    + '<div style="margin-top:4px">' + doneParts + '/3</div></div>' : '')
+                + '</div></div>';
+        }).join('');
+    }
+
+    function dsLocked() { alert('先完成上一章的动画、模拟和测验才能解锁哦 🔒'); }
+
+    var dsCur = 1;
+    function dsChapter(id) {
+        dsCur = id;
+        var el = document.getElementById('dsArea');
+        var c = dsData.find(function (x) { return x.id === id; });
+        if (!c || !el) return;
+        // 未制作完成的章节：显示占位
+        if (!c.anim || !c.sim || !c.quiz) {
+            el.innerHTML = '<div style="margin-bottom:12px"><button class="btn" style="background:#eef0f5" data-dsback="1">← 返回目录</button></div>'
+                + '<div class="note-card" style="text-align:center;padding:50px 20px">'
+                + '<div style="font-size:56px">🚧</div>'
+                + '<h3 style="margin:14px 0 6px">第' + c.id + '章 · ' + c.title + ' 制作中</h3>'
+                + '<p style="color:var(--text-mute);font-size:14px">这一章还没做好，先把前面的章节学完吧！<br>（我会按顺序补充每一章的内容）</p>'
+                + '<button class="btn btn-primary" style="margin-top:16px" data-dsback="1">返回目录</button></div>';
+            var phBacks = el.querySelectorAll('[data-dsback]');
+            phBacks.forEach(function (b) { b.addEventListener('click', dsList); });
+            return;
+        }
+        var p = dsProg['ch' + id] || { anim: false, sim: false, quiz: false, reviews: {} };
+        dsProg['ch' + id] = p;
+        var html = '<div style="margin-bottom:12px"><button class="btn" style="background:#eef0f5" id="dsBackBtn">← 返回目录</button></div>'
+            + '<div class="note-card">'
+            + '<h3 style="font-size:18px">第' + c.id + '章 · ' + c.icon + ' ' + c.title + '</h3>'
+            + '<p style="font-size:13px;color:var(--text-mute);margin-bottom:8px">' + c.desc + '</p>'
+            + '<div style="display:flex;gap:8px;font-size:12px;flex-wrap:wrap">'
+            + '<span style="background:#eef0f5;padding:2px 10px;border-radius:10px;color:var(--text-sub)">📖 动画 ' + (p.anim ? '✓' : '未学') + '</span>'
+            + '<span style="background:#eef0f5;padding:2px 10px;border-radius:10px;color:var(--text-sub)">🖐 模拟 ' + (p.sim ? '✓' : '未练') + '</span>'
+            + '<span style="background:#eef0f5;padding:2px 10px;border-radius:10px;color:var(--text-sub)">✅ 测验 ' + (p.quiz ? '✓' : '未过') + '</span>'
+            + '</div></div>'
+            + (c.intro ? '<div class="note-card"><h3 style="margin-bottom:8px">💡 ' + esc(c.intro.what) + '</h3>'
+                + '<div style="background:#f8f9ff;border-left:3px solid #667eea;padding:12px 14px;border-radius:8px;font-size:14px;color:var(--text-sub);line-height:1.9;margin-bottom:10px">' + esc(c.intro.text) + '</div>'
+                + '<div style="background:#f0fdf4;border-left:3px solid #22c55e;padding:12px 14px;border-radius:8px;font-size:13px;color:var(--text-sub);line-height:1.9;margin-bottom:10px"><b style="color:#16a34a">✅ 为什么快？</b><br>' + esc(c.intro.why) + '</div>'
+                + '<div style="background:#fef2f2;border-left:3px solid #ef4444;padding:12px 14px;border-radius:8px;font-size:13px;color:var(--text-sub);line-height:1.9"><b style="color:#dc2626">⚠️ 缺点是什么？</b><br>' + esc(c.intro.pain) + '</div>'
+                + '</div>' : '')
+            + dsAnimHtml(c, p)
+            + dsSimHtml(c, p)
+            + dsCodeHtml(c)
+            + dsQuizHtml(c, p)
+            + dsReviewHtml(c, p);
+        el.innerHTML = html;
+        dsAnimReset();
+        dsSimReset();
+        // 事件绑定（用 addEventListener 替代 inline onclick，兼容性更好）
+        var ab = document.getElementById('dsAnimBtn');
+        if (ab) ab.addEventListener('click', dsAnimStep);
+        var rb2 = document.getElementById('dsAnimResetBtn');
+        if (rb2) rb2.addEventListener('click', dsAnimReset);
+        var srb = document.getElementById('dsSimResetBtn');
+        if (srb) srb.addEventListener('click', dsSimReset);
+        var back = document.getElementById('dsBackBtn');
+        if (back) back.addEventListener('click', dsList);
+        var area2 = document.getElementById('dsArea');
+        if (area2) {
+            area2.querySelectorAll('[data-simop]').forEach(function (b) {
+                b.addEventListener('click', function () { dsSimOp(this.dataset.simop); });
+            });
+            area2.querySelectorAll('[data-quiz]').forEach(function (b) {
+                b.addEventListener('click', function () { dsQuizAns(parseInt(this.dataset.quiz), parseInt(this.dataset.opt), this); });
+            });
+            area2.querySelectorAll('[data-review]').forEach(function (b) {
+                b.addEventListener('click', function () { dsReviewDo(parseInt(this.dataset.review)); });
+            });
+            area2.querySelectorAll('[data-revans]').forEach(function (b) {
+                b.addEventListener('click', function () { dsReviewAns(parseInt(this.dataset.revans), parseInt(this.dataset.opt), this); });
+            });
+        }
+    }
+
+    /* ---- 动画 ---- */
+    function dsAnimHtml(c, p) {
+        return '<div class="note-card"><h3 style="margin-bottom:8px">📖 ' + c.anim.title + '</h3>'
+            + '<div id="dsAnimBox" style="background:var(--code-bg);border-radius:10px;padding:16px;min-height:90px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"></div>'
+            + '<div id="dsAnimDesc" style="font-size:13px;color:var(--text-sub);margin:10px 0;min-height:22px"></div>'
+            + '<div id="dsAnimDetail" style="display:none;background:#f8f9ff;border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text-sub);line-height:1.9;margin-bottom:8px"></div>'
+            + '<button class="btn btn-primary" id="dsAnimBtn">▶ 开始演示</button>'
+            + '<button class="btn" style="background:#eef0f5" id="dsAnimResetBtn">↺ 重播</button>'
+            + '<span style="font-size:12px;color:var(--text-mute);margin-left:8px">' + (p.anim ? '✓ 已看过' : '看完自动标记') + '</span></div>';
+    }
+    /* ---- 动画 ---- */
+    function dsCell(v, i, color) {
+        return '<div style="min-width:52px;text-align:center;border-radius:8px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.3)">'
+            + '<div style="background:' + (color || '#3b82f6') + ';color:#fff;font-size:16px;font-weight:700;padding:8px 10px">' + v + '</div>'
+            + '<div style="background:rgba(255,255,255,0.08);color:#8a8fa8;font-size:11px;padding:2px">[' + i + ']</div>'
+            + '</div>';
+    }
+    function dsArrHtml(arr, highlight, color) {
+        var h = '';
+        for (var i = 0; i < arr.length; i++) {
+            h += dsCell(arr[i], i, highlight === i ? '#f59e0b' : color);
+        }
+        return h;
+    }
+    var dsAnimIdx = -1;
+    function dsAnimReset() {
+        dsAnimIdx = -1;
+        var box = document.getElementById('dsAnimBox'), desc = document.getElementById('dsAnimDesc');
+        var btn = document.getElementById('dsAnimBtn');
+        if (btn) btn.textContent = '▶ 开始演示';
+        if (desc) desc.textContent = '点击「开始演示」，一步步观察数组的操作过程';
+        if (box) box.innerHTML = '<div style="color:#8a8fa8;font-size:13px">等待开始...</div>';
+    }
+    function dsAnimStep() {
+        var c = dsData.find(function (x) { return x.id === dsCur; });
+        if (!c || !c.anim) return;
+        var steps = c.anim.steps;
+        dsAnimIdx++;
+        var box = document.getElementById('dsAnimBox'), desc = document.getElementById('dsAnimDesc');
+        var btn = document.getElementById('dsAnimBtn');
+        if (!box || !desc) return;
+        if (dsAnimIdx >= steps.length) {
+            var p = dsProg['ch' + dsCur]; p.anim = true; dsSave(); dsInfo();
+            if (btn) btn.textContent = '✅ 已看完';
+            desc.textContent = '演示结束！你已经理解了本节的原理，继续做「动手模拟」吧 👇';
+            return;
+        }
+        var s = steps[dsAnimIdx];
+        if (btn) btn.textContent = '⏭ 下一步';
+        desc.innerHTML = '<b>[' + (dsAnimIdx + 1) + '/' + steps.length + ']</b> ' + s.desc;
+        var detailEl = document.getElementById('dsAnimDetail');
+        if (detailEl) { detailEl.style.display = 'block'; detailEl.innerHTML = s.detail || ''; }
+        if (s.arr) {
+            // 有 arr 数据就渲染格子（支持 hl 高亮下标）
+            box.innerHTML = dsArrHtml(s.arr, s.hl, s.hl !== undefined ? (s.color || '#f59e0b') : undefined);
+        } else if (s.show) {
+            // 文字展示型步骤
+            box.innerHTML = '<div style="color:#c0caf5;font-size:14px;line-height:2;white-space:pre-wrap">' + esc(s.show) + '</div>';
+        }
+    }
+
+    /* ---- 模拟 ---- */
+    var dsSimArr = [];
+    function dsSimReset() {
+        var c = dsData.find(function (x) { return x.id === dsCur; });
+        if (!c || !c.sim) return;
+        dsSimArr = (c.sim.init || []).slice();
+        var box = document.getElementById('dsSimBox');
+        var msg = document.getElementById('dsSimMsg');
+        if (dsCur === 1) {
+            if (box) box.innerHTML = dsArrHtml(dsSimArr);
+            if (msg) msg.textContent = '初始数组，点下面的按钮操作它';
+        } else {
+            if (box) box.innerHTML = '<div style="color:#8a8fa8;font-size:13px">' + (c.sim.init && c.sim.init[0] ? c.sim.init[0] : '') + '</div>';
+            if (msg) msg.textContent = '点击下面的按钮，逐步查看这个过程';
+        }
+    }
+    function dsSimHtml(c, p) {
+        return '<div class="note-card"><h3 style="margin-bottom:8px">🖐 ' + c.sim.title + '</h3>'
+            + '<p style="font-size:13px;color:var(--text-mute);margin-bottom:10px">' + c.sim.desc + '</p>'
+            + '<div id="dsSimBox" style="background:var(--code-bg);border-radius:10px;padding:16px;min-height:70px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"></div>'
+            + '<div id="dsSimMsg" style="font-size:13px;color:var(--text-sub);margin:10px 0;min-height:22px"></div>'
+            + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+            + c.sim.ops.map(function (op) {
+                return '<button class="btn" style="background:#eef0f5;margin:0" data-simop="' + op.id + '">' + op.label + '</button>';
+            }).join('')
+            + '<button class="btn" style="background:#eef0f5;margin:0" id="dsSimResetBtn">↺ 重置</button>'
+            + '</div></div>';
+    }
+    function dsSimOp(opId) {
+        var c = dsData.find(function (x) { return x.id === dsCur; });
+        if (!c || !c.sim) return;
+        var op = c.sim.ops.find(function (x) { return x.id === opId; });
+        if (!op) return;
+        var box = document.getElementById('dsSimBox'), msg = document.getElementById('dsSimMsg');
+        if (!box || !msg) return;
+        // 第1章数组：有真实数据操作；其他章节：显示步骤讲解
+        if (dsCur === 1) {
+            var highlight = -1;
+            if (op.act === 'append') {
+                dsSimArr.push(op.value);
+                highlight = dsSimArr.length - 1;
+            } else if (op.act === 'insert') {
+                dsSimArr.splice(op.index, 0, op.value);
+                highlight = op.index;
+            } else if (op.act === 'delete') {
+                dsSimArr.splice(op.index, 1);
+            } else if (op.act === 'find') {
+                var idx = dsSimArr.indexOf(op.value);
+                if (idx >= 0) { highlight = idx; msg.textContent = '找到了！' + op.value + ' 在下标 ' + idx + '（从0开始逐个比较）'; }
+                else { msg.textContent = '没找到 ' + op.value; }
+                box.innerHTML = dsArrHtml(dsSimArr, highlight, '#22c55e');
+                return;
+            }
+            msg.textContent = op.explain;
+            box.innerHTML = dsArrHtml(dsSimArr, highlight, highlight >= 0 ? '#f59e0b' : undefined);
+        } else {
+            // 其他章节：展示 init 文字 + 步骤讲解
+            msg.innerHTML = '<b>步骤演示：</b><br>' + (op.explain || '');
+        }
+        // 标记模拟完成
+        var p = dsProg['ch' + dsCur]; p.sim = true; dsSave(); dsInfo();
+    }
+
+    /* ---- 代码 ---- */
+    function dsCodeHtml(c) {
+        return '<div class="note-card"><h3 style="margin-bottom:8px">💻 ' + c.code.title + '</h3>'
+            + c.code.blocks.map(function (b, bi) {
+                return '<div style="margin-bottom:12px"><div style="font-size:13px;font-weight:600;color:var(--text-sub);margin-bottom:6px">' + b.name + '</div>'
+                    + '<div class="code-wrap"><button class="copy-btn" onclick="dsCopyCode(' + bi + ')">📋 复制</button>'
+                    + '<pre style="white-space:pre-wrap">' + esc(b.code) + '</pre></div>'
+                    + (b.notes ? '<div style="background:#f8f9ff;border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text-sub);line-height:1.9;white-space:pre-wrap;margin-top:8px">📝 <b>讲解：</b><br>' + esc(b.notes) + '</div>' : '')
+                    + '</div>';
+            }).join('')
+            + '<p style="font-size:12px;color:var(--text-mute)">💡 看完代码，去 Java 练习里做对应章节的题目巩固</p></div>';
+    }
+    function dsCopyCode(bi) {
+        var c = dsData.find(function (x) { return x.id === dsCur; });
+        if (!c || !c.code) return;
+        var code = c.code.blocks[bi].code;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(code).then(function () { toast('✅ 代码已复制'); });
+        } else {
+            var ta = document.createElement('textarea');
+            ta.value = code; ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select();
+            document.execCommand('copy'); document.body.removeChild(ta);
+            toast('✅ 代码已复制');
+        }
+    }
+
+    /* ---- 测验 ---- */
+    function dsQuizHtml(c, p) {
+        return '<div class="note-card"><h3 style="margin-bottom:8px">✅ 章节测验（答对4题通关）</h3>'
+            + '<div id="dsQuizBox">'
+            + c.quiz.map(function (q, qi) {
+                return '<div style="margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)">'
+                    + '<div style="font-size:14px;color:var(--text);margin-bottom:6px">' + (qi + 1) + '. ' + q.q + '</div>'
+                    + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+                    + q.options.map(function (opt, oi) {
+                        return '<button class="btn" style="background:#eef0f5;margin:0;font-size:13px" data-quiz="' + qi + '" data-opt="' + oi + '">' + opt + '</button>';
+                    }).join('')
+                    + '</div>'
+                    + '<div id="dsQuizMsg' + qi + '" style="font-size:12px;margin-top:4px;min-height:18px"></div>'
+                    + '</div>';
+            }).join('')
+            + '<div id="dsQuizResult" style="font-size:14px;font-weight:600;color:#667eea;text-align:center;padding:8px"></div>'
+            + '</div></div>';
+    }
+    var dsQuizCorrect = 0;
+    function dsQuizAns(qi, oi, btn) {
+        var c = dsData.find(function (x) { return x.id === dsCur; });
+        if (!c || !c.quiz) return;
+        var q = c.quiz[qi];
+        var msg = document.getElementById('dsQuizMsg' + qi);
+        if (!msg) return;
+        var btns = btn.parentNode.querySelectorAll('button');
+        for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
+        if (oi === q.answer) {
+            btn.style.background = '#27ae60'; btn.style.color = '#fff';
+            msg.innerHTML = '<span style="color:#27ae60">✅ 正确！</span> ' + q.explain;
+            dsQuizCorrect++;
+        } else {
+            btn.style.background = '#e74c3c'; btn.style.color = '#fff';
+            btns[q.answer].style.background = '#27ae60'; btns[q.answer].style.color = '#fff';
+            msg.innerHTML = '<span style="color:#e74c3c">❌ 错误。</span> ' + q.explain;
+        }
+        var res = document.getElementById('dsQuizResult');
+        if (res) res.textContent = '答对 ' + dsQuizCorrect + ' / ' + c.quiz.length;
+        if (dsQuizCorrect >= 4) {
+            var p = dsProg['ch' + dsCur]; p.quiz = true; dsSave(); dsInfo();
+            // 安排复习：1/3/7 天后
+            var now = Date.now();
+            (c.review || []).forEach(function (r) {
+                if (!p.reviews[String(r.day)]) {
+                    p.reviews[String(r.day)] = { due: now + r.day * 24 * 3600 * 1000, done: false, q: r.q, options: r.options, answer: r.answer };
+                }
+            });
+            dsSave();
+            if (res) res.innerHTML = '<span style="color:#27ae60">🎉 通关！第2章已解锁，去看看吧！</span>';
+            setTimeout(function () { dsChapter(dsCur); }, 1500);
+        }
+    }
+
+    /* ---- 复习 ---- */
+    function dsReviewHtml(c, p) {
+        return '<div class="note-card"><h3 style="margin-bottom:8px">📅 定时复习（防遗忘）</h3>'
+            + '<p style="font-size:13px;color:var(--text-mute);margin-bottom:10px">学完自动安排：1天后、3天后、7天后各复习一次。到期回来做一道题巩固。</p>'
+            + '<div id="dsReviewBox">' + dsReviewItems(c, p) + '</div></div>';
+    }
+    function dsReviewItems(c, p) {
+        var html = '';
+        var days = [1, 3, 7];
+        days.forEach(function (d) {
+            var r = p.reviews[String(d)];
+            var label = '第' + d + '天';
+            if (!r) html += '<div style="font-size:13px;color:var(--text-mute);margin-bottom:6px">⏳ ' + label + '：通关后自动安排</div>';
+            else if (r.done) html += '<div style="font-size:13px;color:#27ae60;margin-bottom:6px">✅ ' + label + '：已完成</div>';
+            else if (r.due <= Date.now()) html += '<div style="font-size:13px;color:#e67e22;margin-bottom:6px">🔔 ' + label + '：<button class="btn" style="background:#eef0f5;font-size:12px;padding:4px 12px;margin:0 0 0 6px" data-review="' + d + '">现在复习</button></div>';
+            else html += '<div style="font-size:13px;color:var(--text-mute);margin-bottom:6px">⏳ ' + label + '：' + dsDueIn(r.due) + '后到期</div>';
+        });
+        return html;
+    }
+    function dsDueIn(t) {
+        var h = Math.max(0, Math.round((t - Date.now()) / 3600000));
+        if (h < 1) return '不足1小时';
+        if (h < 24) return h + '小时';
+        return Math.round(h / 24) + '天';
+    }
+    function dsReviewDo(day) {
+        var c = dsData.find(function (x) { return x.id === dsCur; });
+        var p = dsProg['ch' + dsCur];
+        if (!p) return;
+        var r = p.reviews[String(day)];
+        if (!r) return;
+        var box = document.getElementById('dsReviewBox');
+        if (!box) return;
+        box.innerHTML = '<div style="font-size:14px;color:var(--text);margin-bottom:8px">' + r.q + '</div>'
+            + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+            + r.options.map(function (opt, oi) {
+                return '<button class="btn" style="background:#eef0f5;margin:0;font-size:13px" data-revans="' + day + '" data-opt="' + oi + '">' + opt + '</button>';
+            }).join('')
+            + '</div><div id="dsReviewMsg" style="font-size:12px;margin-top:6px"></div>';
+    }
+    function dsReviewAns(day, oi, btn) {
+        var c = dsData.find(function (x) { return x.id === dsCur; });
+        var p = dsProg['ch' + dsCur];
+        if (!p) return;
+        var r = p.reviews[String(day)];
+        var msg = document.getElementById('dsReviewMsg');
+        if (!msg) return;
+        var btns = btn.parentNode.querySelectorAll('button');
+        for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
+        if (oi === r.answer) {
+            btn.style.background = '#27ae60'; btn.style.color = '#fff';
+            msg.innerHTML = '<span style="color:#27ae60">✅ 复习完成！</span>';
+            r.done = true; dsSave(); dsInfo();
+        } else {
+            btn.style.background = '#e74c3c'; btn.style.color = '#fff';
+            btns[r.answer].style.background = '#27ae60'; btns[r.answer].style.color = '#fff';
+            msg.innerHTML = '<span style="color:#e74c3c">❌ 错了，再看一遍动画吧。</span>';
+        }
+    }
+
+    document.addEventListener('click', function (e) {
+        if (e.target.closest && e.target.closest('[data-tab="ds"]')) {
+            dsRender();
+        }
+    });
+
+    /* ===== Java 速查手册 ===== */
+    var csData = [
+        {"cat": "输入输出", "items": [
+            {"name": "Scanner 输入", "code": "Scanner sc = new Scanner(System.in);\nint n = sc.nextInt();\nString s = sc.next();", "note": "读整数 nextInt()，读字符串 next()，读一行 nextLine()"},
+            {"name": "输出", "code": "System.out.println(x);   // 换行\nSystem.out.print(x);     // 不换行\nSystem.out.printf(\"%d %.2f\", n, f);", "note": "printf: %d整数 %f浮点 %.2f保留2位 %s字符串"}
+        ]},
+        {"cat": "字符串", "items": [
+            {"name": "常用方法", "code": "s.length()          // 长度\ns.charAt(i)         // 取字符\ns.substring(a,b)     // 截取[a,b)\ns.indexOf(x)         // 查找位置，没有返回-1\ns.equals(t)          // 比较内容(别用==)\ns.toCharArray()      // 转字符数组", "note": "字符串不可变，频繁修改用 StringBuilder"},
+            {"name": "StringBuilder", "code": "StringBuilder sb = new StringBuilder();\nsb.append(x);        // 追加\nsb.insert(i, x);      // 插入\nsb.reverse();         // 反转\nsb.toString();        // 转String", "note": "拼接/反转首选，比赛常用"},
+            {"name": "转换", "code": "int n = Integer.parseInt(s);   // String转int\ndouble d = Double.parseDouble(s);\nString s = String.valueOf(n);   // int转String\nString s = Integer.toString(n);\nint m = Integer.parseInt(s, 2); // 二进制解析", "note": "parseXXX 字符串转基本类型，valueOf/toString 转字符串"}
+        ]},
+        {"cat": "集合", "items": [
+            {"name": "数组排序", "code": "int[] arr = {3,1,2};\nArrays.sort(arr);                 // 升序\nArrays.sort(arr, 0, n);           // 部分排序\nString[] ss = {...};\nArrays.sort(ss);                   // 字符串字典序", "note": "import java.util.Arrays;"},
+            {"name": "ArrayList", "code": "ArrayList<Integer> list = new ArrayList<>();\nlist.add(x);          // 末尾加\nlist.get(i);          // 取\nlist.set(i, x);       // 改\nlist.remove(i);       // 删\nlist.size();          // 大小\nCollections.sort(list);  // 排序", "note": "动态数组，比赛常用"},
+            {"name": "HashMap", "code": "HashMap<String, Integer> map = new HashMap<>();\nmap.put(k, v);        // 存(重复key覆盖)\nmap.get(k);           // 取\nmap.containsKey(k);   // 判断存在\nmap.keySet();         // 所有key\nfor (Map.Entry<String,Integer> e : map.entrySet()) {\n    e.getKey(); e.getValue();\n}", "note": "O(1)查找，统计次数首选"},
+            {"name": "HashSet", "code": "HashSet<Integer> set = new HashSet<>();\nset.add(x);           // 加(重复忽略)\nset.contains(x);      // 判断存在\nset.size();           // 大小", "note": "去重神器"},
+            {"name": "Stack/Queue", "code": "Deque<Integer> stack = new ArrayDeque<>();\nstack.push(x);  stack.pop();  stack.peek();\n\nQueue<Integer> q = new LinkedList<>();\nq.offer(x);   q.poll();   q.peek();", "note": "栈用ArrayDeque，队列用LinkedList"}
+        ]},
+        {"cat": "数学与大数", "items": [
+            {"name": "Math 常用", "code": "Math.max(a,b)  Math.min(a,b)\nMath.abs(x)     // 绝对值\nMath.sqrt(x)    // 平方根\nMath.pow(a,b)   // a的b次方\nMath.floor(x) / Math.ceil(x)\nMath.round(x)   // 四舍五入", "note": "取整注意：ceil向上 floor向下"},
+            {"name": "BigInteger", "code": "BigInteger a = new BigInteger(s);\nBigInteger b = BigInteger.valueOf(10);\na.add(b)      // 加\na.subtract(b) // 减\na.multiply(b) // 乘\na.divide(b)   // 除\na.mod(b)      // 取余\na.compareTo(b)// 比较", "note": "大数题必用，import java.math.BigInteger"},
+            {"name": "Random", "code": "Random r = new Random();\nr.nextInt(n);    // [0,n)随机整数\nr.nextInt();     // 任意int\nr.nextDouble();  // [0,1)小数", "note": "比赛很少用随机，但模拟题可能用到"}
+        ]},
+        {"cat": "常用技巧", "items": [
+            {"name": "读入加速", "code": "BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\nString s = br.readLine();\nString[] parts = s.split(\" \");", "note": "大数据量输入时比Scanner快"},
+            {"name": "数组初始化", "code": "Arrays.fill(arr, 0);          // 全部填0\nArrays.toString(arr);         // 转字符串输出\nint[] copy = Arrays.copyOf(arr, n);", "note": "fill/toString/copyOf 常用"},
+            {"name": "Integer.MAX_VALUE", "code": "Integer.MAX_VALUE  // 2147483647\nInteger.MIN_VALUE  // -2147483648\nLong.MAX_VALUE     // 9.2e18", "note": "初始化最大值/最小值时用，防溢出"}
+        ]}
+    ];
+
+    function csRender() {
+        var info = document.getElementById('csInfo');
+        if (info) info.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'
+            + '<div><span style="font-size:20px">📘</span><span style="font-size:16px;font-weight:600;color:#667eea;margin-left:6px">Java 速查手册</span>'
+            + '<span style="font-size:13px;color:#999;margin-left:8px">蓝桥杯比赛常用 API，考前翻一遍</span></div></div>';
+        var el = document.getElementById('csArea');
+        if (!el) return;
+        el.innerHTML = csData.map(function (cat) {
+            return '<div class="note-card"><h3 style="margin-bottom:10px">' + cat.cat + '</h3>'
+                + cat.items.map(function (it) {
+                    return '<div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)">'
+                        + '<div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">' + it.name + '</div>'
+                        + '<div class="code-wrap"><button class="copy-btn" onclick="csCopy(this)" data-code="' + esc(it.code).replace(/"/g, '&quot;') + '">📋 复制</button>'
+                        + '<pre style="white-space:pre-wrap;margin:0">' + esc(it.code) + '</pre></div>'
+                        + '<div style="font-size:12px;color:var(--text-mute);margin-top:6px">💡 ' + it.note + '</div>'
+                        + '</div>';
+                }).join('')
+                + '</div>';
+        }).join('');
+    }
+
+    function csCopy(btn) {
+        var code = btn.getAttribute('data-code').replace(/&quot;/g, '"');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(code).then(function () { toast('✅ 已复制'); });
+        } else {
+            var ta = document.createElement('textarea');
+            ta.value = code; ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select();
+            document.execCommand('copy'); document.body.removeChild(ta);
+            toast('✅ 已复制');
+        }
+    }
+
+    document.addEventListener('click', function (e) {
+        if (e.target.closest && e.target.closest('[data-tab="cheatsheet"]')) {
+            csRender();
+        }
+    });
+</script>
+</body>
+</html>
