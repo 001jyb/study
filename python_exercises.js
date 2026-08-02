@@ -33,7 +33,7 @@ function render(){
       var ba="";
       B.forEach(function(b){
         var got=b.req(gg);
-        ba+='<span onclick="showBadgeDetail('+B.indexOf(b)+')" title="'+esc(b.desc)+'" style="cursor:pointer;display:inline-block;margin:3px;padding:4px 10px;border-radius:12px;font-size:12px;background:'+(got?"#667eea28":"#f0f0f0")+';color:'+(got?"#667eea":"#ccc")+';border:1px solid '+(got?"#667eea44":"#e8e8e8")+';transition:all 0.2s" onmouseover="this.style.transform=\'scale(1.1)\';this.style.boxShadow=\'0 2px 8px rgba(0,0,0,0.1)\'" onmouseout="this.style.transform=\'scale(1)\';this.style.boxShadow=\'none\'">'+(got?"⭐":"⬚")+" "+b.name+"</span>";
+        ba+='<span class="badge-item" onclick="showBadgeDetail('+B.indexOf(b)+')" title="'+esc(b.desc)+'" style="cursor:pointer;display:inline-block;margin:3px;padding:4px 10px;border-radius:12px;font-size:12px;background:'+(got?"#667eea28":"#f0f0f0")+';color:'+(got?"#667eea":"#ccc")+';border:1px solid '+(got?"#667eea44":"#e8e8e8")+';transition:all 0.2s" >'+(got?"⭐":"⬚")+" "+b.name+"</span>";
       });
       baEl.innerHTML=ba;
     }
@@ -107,6 +107,7 @@ function exList(){
         .map(function(t){return '<option value="'+t+'"'+(window.__exTag===t?' selected':'')+'>'+t+'</option>';}).join('')
       +(window.curLang==='lanqiao'?'':'</select>');
     var h="<div style=\"display:flex;align-items:center;gap:8px;margin-bottom:12px\">"
+      +"<button onclick=\"showResetMenu()\" style=\"padding:6px 14px;border:1px solid #ddd;border-radius:8px;background:white;cursor:pointer;font-size:13px;color:#e67e22;flex-shrink:0\" onmouseover=\"this.style.background='#fdf3e7'\" onmouseout=\"this.style.background='white'\">🔄 重置</button>"
       +"<button onclick=\"backS()\" style=\"padding:6px 14px;border:1px solid #ddd;border-radius:8px;background:white;cursor:pointer;font-size:13px;color:#666;flex-shrink:0\" onmouseover=\"this.style.background='#f5f5f5'\" onmouseout=\"this.style.background='white'\">← 返回</button>"
       +sf
       +"</div>";
@@ -115,7 +116,7 @@ function exList(){
       var d=gg.c.indexOf(e.id)>=0;
       var tstr="";
       h+="<div class=\"ex-item\" data-tag=\""+esc(e.tag||'')+"\" onclick=\"startC("+e.id+")\" style=\"border-radius:10px;padding:10px 14px;margin-bottom:6px;cursor:pointer;background:white;border:1px solid #ececec;display:flex;align-items:center;gap:10px;transition:all 0.15s;opacity:"+(d?"0.55":"1")+";animation:fadeIn 0.2s ease\" onmouseover=\"this.style.borderColor='#667eea';this.style.boxShadow='0 1px 4px rgba(102,126,234,0.12)'\" onmouseout=\"this.style.borderColor='#ececec';this.style.boxShadow=''\">"
-        +"<div style=\"width:32px;height:32px;border-radius:50%;background:"+(d?"#27ae60":"#667eea")+";color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;\">"+(d?"✅":e.id)+"</div>"
+        +"<div style=\"width:32px;height:32px;border-radius:50%;background:"+(d?"#27ae60":"#667eea")+";color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;\">"+(d?"✅":(exercises.indexOf(e)+1))+"</div>"
         +"<div style=\"flex:1;min-width:0\">"
         +"<div class=\"ex-title\" style=\"font-size:14px;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis\">"+esc(e.title)+"</div>"
         +"<div class=\"ex-desc\" style=\"font-size:11px;color:#999;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis\">"+esc(e.desc)+"</div>"
@@ -168,13 +169,14 @@ function showC(){
     var xpInfo='<span class="ex-xp">🔥 +'+ex.xp+'XP</span>';
     var h='<div class="ex-container">'
       +'<div class="ex-header">'
-        +'<div style="display:flex;align-items:center"><span class="ex-num">#'+(ex.id+'').padStart(3,'0')+'</span><span class="ex-title">'+esc(ex.title)+'</span></div>'
+        +'<div style="display:flex;align-items:center"><span class="ex-num">#'+((''+(exercises.indexOf(ex)+1)).padStart(3,'0'))+'</span><span class="ex-title">'+esc(ex.title)+'</span></div>'
         +'<button class="ex-exit-btn" onclick="exitC()">✕ 退出</button>'
       +'</div>'
       +'<div class="ex-body">'
         +'<div class="ex-left">'
           +'<div class="ex-desc-box"><div class="ex-desc-label">📝 题目说明</div>'+esc(ex.desc)+'</div>'
           +'<div><div style="font-size:12px;color:#999;margin-bottom:4px">代码行进度</div><div class="ex-progress-wrap"><div class="ex-progress-bar" id="exProg" style="width:0%"></div></div></div>'
+          +(ex.knowledge?'<div class="ex-knowledge" style="background:#f8f9ff;border-left:3px solid #667eea;border-radius:8px;padding:10px 12px;font-size:13px;color:#565f89;line-height:1.9;margin-top:8px;white-space:pre-wrap">📖 <b>知识点：</b><br>'+esc(ex.knowledge)+'</div>':'')
           +'<div id="hintArea" class="ex-hint-area"></div>'
           +'<div class="ex-stats"><span>📊 '+ex.lines.length+' 行代码</span>'+xpInfo+'</div>'
           +'<div class="code-wrap"><button class="copy-btn" onclick="copyCode('+ex.id+')">📋 复制完整代码</button></div>'
@@ -394,6 +396,46 @@ function cO(){try{var el=document.getElementById("passOverlay");if(el&&el.parent
 
 function n(){try{cO();var gg=g();var rm=exercises?exercises.filter(function(e){return gg.c.indexOf(e.id)<0}):[];var id=rm.filter(function(e){return e.difficulty===cd});var nd=id.length>0?id[0]:rm[0];if(nd)startC(nd.id);else{alert("🎉全部通关！");exitC()}}catch(e){}}
 function resetG(){if(confirm("重置所有进度？")){localStorage.removeItem("pg");cc=null;cd=null;render()}}
+
+/* 重置进度：按难度 / 全部（望月需求：重新做哪里就做哪里） */
+function showResetMenu(){
+  var el=document.getElementById("exList");
+  if(!el)return;
+  var dname=cd||'当前难度';
+  el.innerHTML='<div style="padding:24px 20px;text-align:center;background:white;border:1px solid #ececec;border-radius:12px;animation:fadeIn 0.2s ease">'
+    +'<div style="font-size:17px;font-weight:600;margin-bottom:6px">🔄 重置进度</div>'
+    +'<div style="font-size:13px;color:#888;margin-bottom:16px">选一个范围重新做，已完成的题会变回未做状态</div>'
+    +'<div style="display:flex;flex-direction:column;gap:8px;max-width:280px;margin:0 auto">'
+    +'<button class="btn" style="background:#eef0f5;margin:0;font-size:14px" onclick="resetDiff()">仅「'+dname+'」难度</button>'
+    +'<button class="btn" style="background:#eef0f5;margin:0;font-size:14px" onclick="resetAll()">全部难度</button>'
+    +'<button class="btn btn-primary" style="margin:0;font-size:14px" onclick="render()">取消</button>'
+    +'</div></div>';
+}
+function resetDiff(){
+  if(!cd)return;
+  if(!confirm('确定重置「'+cd+'」难度的完成进度吗？'))return;
+  try{
+    var gg=g();
+    var remove={};
+    var sum=0;
+    exercises.forEach(function(e){if(e.difficulty===cd)remove[e.id]=e.xp||0;});
+    gg.c=gg.c.filter(function(id){if(remove[id]!==undefined){sum+=remove[id];return false;}return true;});
+    gg.x=Math.max(0,(gg.x||0)-sum);
+    s(gg);
+    toast('✅ 已重置「'+cd+'」难度');
+    render();
+  }catch(e){}
+}
+function resetAll(){
+  if(!confirm('确定重置所有难度的完成进度吗？（XP 也会清零）'))return;
+  try{
+    var gg=g();
+    gg.c=[];gg.x=0;
+    s(gg);
+    toast('✅ 已重置全部进度');
+    render();
+  }catch(e){}
+}
 
 /* Badge detail popup */
 function showBadgeDetail(idx){

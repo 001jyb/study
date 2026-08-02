@@ -53,6 +53,7 @@
         .container { max-width: 900px; margin: 0 auto; padding: 20px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        .badge-item:hover { transform: scale(1.1); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .note-card { background: var(--card); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); transition: box-shadow 0.2s, background 0.3s; }
         .note-card:hover { box-shadow: var(--shadow-hover); }
         .note-card h3 { font-size: 17px; color: var(--text); margin-bottom: 8px; padding-left: 12px; border-left: 4px solid var(--primary); }
@@ -330,6 +331,48 @@
         .ex-msg { font-size: 13px; padding: 3px 20px 14px; min-height: 24px; }
         .ex-msg.error { color: #e74c3c; }
         .ex-msg.success { color: #27ae60; }
+    
+        /* ===== UI 优化增强（2026-08-02） ===== */
+        :root {
+            --radius: 14px;
+            --shadow: 0 2px 8px rgba(15,23,42,.05);
+            --shadow-hover: 0 10px 28px rgba(15,23,42,.12);
+        }
+        /* Header 装饰光晕 */
+        header { position: relative; overflow: hidden; padding: 52px 20px 44px; }
+        header::before { content: ''; position: absolute; width: 420px; height: 420px; border-radius: 50%; background: rgba(255,255,255,.08); top: -200px; right: -100px; pointer-events: none; }
+        header::after { content: ''; position: absolute; width: 300px; height: 300px; border-radius: 50%; background: rgba(255,255,255,.06); bottom: -160px; left: -80px; pointer-events: none; }
+        header h1 { font-size: 30px; letter-spacing: 1px; position: relative; text-shadow: 0 2px 12px rgba(0,0,0,.15); }
+        header p { font-size: 14px; opacity: .9; position: relative; }
+        /* 导航：渐变胶囊激活 */
+        .tabs { box-shadow: 0 2px 10px rgba(15,23,42,.04); gap: 2px; }
+        .tab-btn { padding: 10px 18px; margin: 8px 3px; border-radius: 10px; border-bottom: none; font-size: 14px; font-weight: 500; }
+        .tab-btn:hover { background: rgba(102,126,234,.1); color: var(--primary); }
+        .tab-btn.active { background: linear-gradient(135deg,#667eea,#764ba2); color: #fff !important; border-bottom: none; box-shadow: 0 4px 14px rgba(102,126,234,.35); }
+        body.dark .tab-btn.active { background: linear-gradient(135deg,#8b9cff,#7a5fd6); }
+        /* 卡片 */
+        .note-card { border-radius: 16px; border: 1px solid rgba(15,23,42,.04); }
+        .note-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+        /* 按钮 */
+        .btn { border-radius: 10px; font-weight: 500; }
+        .btn:hover { transform: translateY(-1px); }
+        .btn:active { transform: scale(.97); }
+        /* 统计卡数字 */
+        .stat-card .stat-num { font-size: 28px; }
+        /* 滚动条美化 */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-thumb { background: rgba(102,126,234,.35); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(102,126,234,.55); }
+        ::-webkit-scrollbar-track { background: transparent; }
+        /* 移动端微调 */
+        @media (max-width: 600px) {
+            header { padding: 36px 16px 30px; }
+            header h1 { font-size: 24px; }
+            .container { padding: 14px; }
+            .tab-btn { padding: 8px 12px; margin: 6px 2px; font-size: 13px; }
+            .note-card { padding: 16px; border-radius: 14px; }
+        }
+
     </style>
 </head>
 <body>
@@ -340,23 +383,35 @@
 </header>
 <nav class="tabs" id="tabNav">
     <button class="tab-btn active" data-tab="notes">📝 主页</button>
-    <button class="tab-btn" data-tab="python">🐍 Python练习</button>
-    <button class="tab-btn" data-tab="java">☕ Java练习</button>
+    <button class="tab-btn" data-tab="python">🐍 Python</button>
+    <button class="tab-btn" data-tab="java">☕ Java</button>
     <button class="tab-btn" data-tab="c">⚙️ C练习</button>
-    <button class="tab-btn" data-tab="vocab">📖 背单词</button>
-    <button class="tab-btn" data-tab="essays">✍️ 写作范文</button>
+    <button class="tab-btn" data-tab="eng">🆎 英语</button>
     <button class="tab-btn" data-tab="ds">📚 数据结构</button>
     <button class="tab-btn" data-tab="lanqiao">🏆 蓝桥杯</button>
-    <button class="tab-btn" data-tab="cheatsheet">📘 Java速查</button>
     <button class="tab-btn" data-tab="tools">🛠 小工具</button>
     <button class="tab-btn" data-tab="todo">✅ 待办</button>
 </nav>
 
 <div class="container">
+    <div id="javaSubNav" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:10px 14px;background:linear-gradient(135deg,#fdf0ef,#fdeee8);border-radius:12px;">
+        <span style="font-size:13px;font-weight:600;color:#c0392b">☕ Java 模块</span>
+        <button class="btn" id="jsNavEx" style="margin:0;font-size:13px;padding:5px 14px;background:#e74c3c;color:white" onclick="javaView('ex')">💻 Java练习</button>
+        <button class="btn" id="jsNavCs" style="margin:0;font-size:13px;padding:5px 14px;background:#eef0f5" onclick="javaView('cs')">📘 Java速查</button>
+        <button class="btn" id="jsNavJs" style="margin:0;font-size:13px;padding:5px 14px;background:#eef0f5" onclick="javaView('js')">📖 Java知识点</button>
+    </div>
+    <div id="engSubNav" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:10px 14px;background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border-radius:12px;">
+        <span style="font-size:13px;font-weight:600;color:#16a34a">🆎 英语模块</span>
+        <button class="btn" id="engNavVocab" style="margin:0;font-size:13px;padding:5px 14px;background:#16a34a;color:white" onclick="engView('vocab')">📖 背单词</button>
+        <button class="btn" id="engNavEssays" style="margin:0;font-size:13px;padding:5px 14px;background:#eef0f5" onclick="engView('essays')">✍️ 写作范文</button>
+    </div>
+    <div id="pySubNav" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:10px 14px;background:linear-gradient(135deg,#eef2ff,#e8edff);border-radius:12px;">
+        <span style="font-size:13px;font-weight:600;color:#667eea">🐍 Python 模块</span>
+        <button class="btn" id="pyNavEx" style="margin:0;font-size:13px;padding:5px 14px;background:#667eea;color:white" onclick="pyView('ex')">💻 Python练习</button>
+        <button class="btn" id="pyNavJs" style="margin:0;font-size:13px;padding:5px 14px;background:#eef0f5" onclick="pyView('js')">📖 Python知识点</button>
+    </div>
     <div class="tab-content active" id="tab-notes"><div id="noteList"></div></div>
     <div class="tab-content" id="tab-python">
-    <div class="tab-content" id="tab-java"></div>
-    <div class="tab-content" id="tab-c"></div>
         <div id="pyStatus" style="display:none;color:#e74c3c;font-size:13px;text-align:center;padding:10px;"></div>
         <div class="note-card" style="padding:14px 20px;margin-bottom:12px;background:linear-gradient(135deg,#f8f9ff,#eef1ff);">
             <div id="playerInfo">加载中...</div>
@@ -365,7 +420,16 @@
         <div id="currentExercise"></div>
         <div id="diffSelect"></div>
         <div id="exList" style="display:none;"></div>
+        <div id="pyArea" style="display:none"></div>
     </div>
+    <div class="tab-content" id="tab-java">
+        <div class="note-card" style="padding:14px 20px;margin-bottom:12px;background:linear-gradient(135deg,#f8f9ff,#eef1ff);">
+            <div id="csInfo">加载中...</div>
+        </div>
+        <div id="csArea"></div>
+        <div id="jsArea"></div>
+    </div>
+    <div class="tab-content" id="tab-c"></div>
     <div class="tab-content" id="tab-vocab">
         <div class="note-card" style="padding:14px 20px;margin-bottom:12px;background:linear-gradient(135deg,#f8f9ff,#eef1ff);">
             <div id="vocabInfo">加载中...</div>
@@ -379,12 +443,7 @@
         <div id="essayArea"></div>
     </div>
     <div class="tab-content" id="tab-lanqiao"></div>
-    <div class="tab-content" id="tab-cheatsheet">
-        <div class="note-card" style="padding:14px 20px;margin-bottom:12px;background:linear-gradient(135deg,#f8f9ff,#eef1ff);">
-            <div id="csInfo">加载中...</div>
-        </div>
-        <div id="csArea"></div>
-    </div>
+    <div class="tab-content" id="tab-cheatsheet"></div>
     <div class="tab-content" id="tab-ds">
         <div class="note-card" style="padding:14px 20px;margin-bottom:12px;background:linear-gradient(135deg,#f8f9ff,#eef1ff);">
             <div id="dsInfo">加载中...</div>
@@ -400,6 +459,16 @@
         <div id="timerSection" style="margin-top:20px;display:none;">
             <div class="note-card">
                 <h3>🍅 番茄钟</h3>
+                <div style="margin-bottom:10px;text-align:center">
+                    <label style="font-size:13px;color:var(--text-mute)">⏱ 自定义时长</label>
+                    <input type="number" id="timerMin" min="1" max="120" value="25" oninput="timerInput()" style="width:70px;padding:6px 10px;border:1px solid #e0e0e0;border-radius:8px;font-size:16px;text-align:center;margin:0 6px"> 分钟
+                    <div style="margin-top:8px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+                        <button class="btn" style="background:#eef0f5;font-size:12px;padding:4px 12px;margin:0" onclick="setTimerMin(15)">15分</button>
+                        <button class="btn" style="background:#eef0f5;font-size:12px;padding:4px 12px;margin:0" onclick="setTimerMin(25)">25分</button>
+                        <button class="btn" style="background:#eef0f5;font-size:12px;padding:4px 12px;margin:0" onclick="setTimerMin(45)">45分</button>
+                        <button class="btn" style="background:#eef0f5;font-size:12px;padding:4px 12px;margin:0" onclick="setTimerMin(60)">60分</button>
+                    </div>
+                </div>
                 <div class="timer-display" id="timerDisplay">25:00</div>
                 <div class="timer-status" id="timerStatus">点击开始专注学习</div>
                 <div style="text-align:center;">
@@ -428,47 +497,281 @@
 <script src="essays.js"></script>
 <script src="ds_course.js"></script>
 <script src="lanqiao.js"></script>
+<script src="java_knowledge.js"></script>
+<script src="python_knowledge.js"></script>
 <script>var pyExercises = typeof exercises !== "undefined" ? exercises : [];</script>
 <script>
+/* 兼容旧内核浏览器：padStart / NodeList.forEach polyfill */
+if (!String.prototype.padStart) { String.prototype.padStart = function (n, c) { var s = String(this); c = c || " "; while (s.length < n) s = c + s; return s; }; }
+if (window.NodeList && !NodeList.prototype.forEach) { NodeList.prototype.forEach = Array.prototype.forEach; }
+if (!Array.prototype.findIndex) { Array.prototype.findIndex = function (fn) { for (var i = 0; i < this.length; i++) if (fn(this[i], i, this)) return i; return -1; }; }
+</script>
+<script>
+
+
+    function pyView(which) {
+        window.curLang = 'python';
+        if (window.exLang != null && window.exLang !== 'python') { try{cc=null;cd=null;}catch(e){} }
+        window.exLang = 'python';
+        document.querySelectorAll('.tab-content').forEach(function(c){c.classList.remove('active');});
+        var _tbp = document.querySelector('[data-tab="python"]');
+        if (_tbp) _tbp.classList.add('active');
+        var _tp = document.getElementById('tab-python');
+        if (_tp) _tp.classList.add('active');
+        var sub = document.getElementById('pySubNav');
+        if (sub) sub.style.display = 'flex';
+        var _jsubP = document.getElementById('javaSubNav');
+        if (_jsubP) _jsubP.style.display = 'none';
+        var _esubP = document.getElementById('engSubNav');
+        if (_esubP) _esubP.style.display = 'none';
+        var navB = { ex: 'pyNavEx', js: 'pyNavJs' };
+        for (var k in navB) {
+            var nb = document.getElementById(navB[k]);
+            if (nb) nb.style.background = (k === which ? '#667eea' : '#eef0f5');
+            if (nb) nb.style.color = (k === which ? 'white' : '#333');
+        }
+        if (which === 'js') {
+            var pa = document.getElementById('pyArea');
+            if (pa) pa.style.display = 'block';
+            var plc = document.getElementById('playerInfo');
+            if (plc) plc.style.display = 'none';
+            var de = document.getElementById('diffSelect');
+            if (de) de.style.display = 'none';
+            var el = document.getElementById('exList');
+            if (el) el.style.display = 'none';
+            var ce = document.getElementById('currentExercise');
+            if (ce) ce.style.display = 'none';
+            try{pyRender()}catch(e){}
+        } else {
+            var pa2 = document.getElementById('pyArea');
+            if (pa2) pa2.style.display = 'none';
+            var plc2 = document.getElementById('playerInfo');
+            if (plc2) plc2.style.display = '';
+            exercises = pyExercises;
+            try{render()}catch(e){}
+        }
+    }
+    function pyRender() {
+        var el = document.getElementById('pyArea');
+        if (!el) return;
+        var chapters = typeof pythonKnowledge !== 'undefined' ? pythonKnowledge : [];
+        var html = '<div style="animation:fadeIn 0.3s ease">'
+            + '<div style="text-align:center;padding:20px 10px 8px"><div style="font-size:40px">🐍</div>'
+            + '<h2 style="font-size:20px;color:var(--text);margin:6px 0">Python 知识点地图</h2>'
+            + '<p style="font-size:13px;color:var(--text-mute)">共 ' + chapters.length + ' 章 · 做题卡住先查这里 · 点「去做题」直接巩固</p></div>';
+        chapters.forEach(function (c) {
+            html += '<div class="note-card" style="margin-bottom:10px">'
+                + '<div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="pyToggle(' + c.ch + ')">'
+                + '<span style="font-size:26px">' + c.icon + '</span>'
+                + '<div style="flex:1"><div style="font-size:15px;font-weight:600;color:var(--text)">第' + c.ch + '章 · ' + c.title + '</div>'
+                + '<div style="font-size:12px;color:var(--text-mute)">' + c.points.length + ' 个知识点 · 点击展开</div></div>'
+                + '<span id="pyArrow' + c.ch + '" style="color:#aaa;transition:transform 0.2s">▼</span></div>'
+                + '<div id="pyBody' + c.ch + '" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px">'
+                + c.points.map(function (p) {
+                    return '<div style="padding:8px 10px;background:#fafbfd;border-radius:8px;margin-bottom:6px">'
+                        + '<div style="font-size:13px;font-weight:600;color:var(--text)">📌 ' + esc(p.name) + '</div>'
+                        + '<div style="font-size:13px;color:var(--text-sub);margin-top:3px;line-height:1.7">' + esc(p.desc) + '</div>'
+                        + (p.tip ? '<div style="font-size:12px;color:#e67e22;margin-top:3px">💡 ' + esc(p.tip) + '</div>' : '')
+                        + (p.rel && p.rel.length ? '<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">'
+                            + p.rel.map(function (id) { var _seq = (typeof exercises !== 'undefined' && exercises.findIndex) ? exercises.findIndex(function (e) { return e.id === id; }) + 1 : id; return '<button class="btn" style="background:#eef1ff;color:#667eea;font-size:12px;padding:3px 10px;margin:0" onclick="pyGoQ(' + id + ')">去做题 #' + (('' + _seq).padStart(3, '0')) + '</button>'; }).join('')
+                            + '</div>' : '')
+                        + '</div>';
+                }).join('')
+                + '</div></div>';
+        });
+        html += '</div>';
+        el.innerHTML = html;
+    }
+    function pyToggle(ch) {
+        var b = document.getElementById('pyBody' + ch);
+        var a = document.getElementById('pyArrow' + ch);
+        if (!b) return;
+        var open = b.style.display !== 'none';
+        b.style.display = open ? 'none' : 'block';
+        if (a) a.style.transform = open ? '' : 'rotate(180deg)';
+    }
+    function pyGoQ(id) {
+        pyView('ex');
+        try { startC(id); } catch (e) { try { render(); } catch (e2) {} }
+    }
+    function engView(which) {
+        var sub = document.getElementById('engSubNav');
+        if (sub) sub.style.display = 'flex';
+        var _psubE = document.getElementById('pySubNav');
+        if (_psubE) _psubE.style.display = 'none';
+        var navB = { vocab: 'engNavVocab', essays: 'engNavEssays' };
+        for (var k in navB) {
+            var nb = document.getElementById(navB[k]);
+            if (nb) nb.style.background = (k === which ? '#16a34a' : '#eef0f5');
+            if (nb) nb.style.color = (k === which ? 'white' : '#333');
+        }
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        var tb = document.querySelector('[data-tab="eng"]');
+        if (tb) tb.classList.add('active');
+        if (which === 'essays') {
+            var te = document.getElementById('tab-essays');
+            if (te) te.classList.add('active');
+            try{eRender()}catch(e){}
+        } else {
+            var tv = document.getElementById('tab-vocab');
+            if (tv) tv.classList.add('active');
+            try{vocabInfo();vHome();}catch(e){}
+        }
+    }
+    function javaView(which) {
+        window.curLang = 'java';
+        var _esubJ = document.getElementById('engSubNav');
+        if (_esubJ) _esubJ.style.display = 'none';
+        var _psubJ = document.getElementById('pySubNav');
+        if (_psubJ) _psubJ.style.display = 'none';
+        if (window.exLang != null && window.exLang !== 'java') { try{cc=null;cd=null;}catch(e){} }
+        window.exLang = 'java';
+        var sub = document.getElementById('javaSubNav');
+        if (sub) sub.style.display = 'flex';
+        var navB = { ex: 'jsNavEx', cs: 'jsNavCs', js: 'jsNavJs' };
+        for (var k in navB) {
+            var nb = document.getElementById(navB[k]);
+            if (nb) nb.style.background = (k === which ? '#e74c3c' : '#eef0f5');
+            if (nb) nb.style.color = (k === which ? 'white' : '#333');
+        }
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        var tb = document.querySelector('[data-tab="java"]');
+        if (tb) tb.classList.add('active');
+        var _csi = document.getElementById('csInfo'), _csa = document.getElementById('csArea'), _jsa = document.getElementById('jsArea');
+        if (which === 'cs') {
+            document.getElementById('tab-java').classList.add('active');
+            if (_csi) _csi.style.display = '';
+            if (_csa) _csa.style.display = '';
+            if (_jsa) _jsa.style.display = 'none';
+            try{csRender()}catch(e){}
+        } else if (which === 'js') {
+            document.getElementById('tab-java').classList.add('active');
+            if (_csi) _csi.style.display = 'none';
+            if (_csa) _csa.style.display = 'none';
+            if (_jsa) _jsa.style.display = '';
+            try{jsRender()}catch(e){}
+        } else {
+            document.getElementById('tab-python').classList.add('active');
+            exercises = javaExercises;
+            try{render()}catch(e){}
+        }
+    }
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             this.classList.add('active');
             var t = this.dataset.tab;
+            var sub = document.getElementById('javaSubNav');
             window.curLang = (t === 'java' || t === 'c' || t === 'lanqiao') ? t : 'python';
-            if (t === 'java' || t === 'c' || t === 'lanqiao') {
+            var _exT = (t === 'python' || t === 'java' || t === 'c' || t === 'lanqiao');
+            if (_exT && window.exLang != null && window.exLang !== window.curLang) { try{cc=null;cd=null;}catch(e){} }
+            if (_exT) window.exLang = window.curLang;
+            if (t === 'java') {
+                if (sub) sub.style.display = 'flex';
+                var psubJ = document.getElementById('pySubNav');
+                if (psubJ) psubJ.style.display = 'none';
+                javaView('ex');
+            } else if (t === 'c' || t === 'lanqiao') {
+                if (sub) sub.style.display = 'none';
+                var _esubC = document.getElementById('engSubNav');
+                if (_esubC) _esubC.style.display = 'none';
                 document.getElementById('tab-python').classList.add('active');
-                if (t === 'java') { exercises = javaExercises; }
-                else if (t === 'c') { exercises = cExercises; }
+                if (t === 'c') { exercises = cExercises; }
                 else { exercises = lanqiaoExercises; }
                 if (t === 'lanqiao') { try{enterD('挑战')}catch(e){try{render()}catch(e){}} }
                 else { try{render()}catch(e){} }
+            } else if (t === 'eng') {
+                if (sub) sub.style.display = 'none';
+                var esub = document.getElementById('engSubNav');
+                if (esub) esub.style.display = 'flex';
+                var psubE = document.getElementById('pySubNav');
+                if (psubE) psubE.style.display = 'none';
+                engView('vocab');
+            } else if (t === 'vocab' || t === 'essays') {
+                if (sub) sub.style.display = 'none';
+                var esub2 = document.getElementById('engSubNav');
+                if (esub2) esub2.style.display = 'flex';
+                var psub2 = document.getElementById('pySubNav');
+                if (psub2) psub2.style.display = 'none';
+                engView(t === 'essays' ? 'essays' : 'vocab');
+            } else if (t === 'python') {
+                if (sub) sub.style.display = 'none';
+                var esub5 = document.getElementById('engSubNav');
+                if (esub5) esub5.style.display = 'none';
+                var psub5 = document.getElementById('pySubNav');
+                if (psub5) psub5.style.display = 'flex';
+                pyView('ex');
             } else {
-                document.getElementById('tab-' + t).classList.add('active');
-                if (t === 'python') { if(pyExercises && pyExercises.length > 0) { exercises = pyExercises; } try{render()}catch(e){} }
+                if (sub) sub.style.display = 'none';
+                var esub3 = document.getElementById('engSubNav');
+                if (esub3) esub3.style.display = 'none';
+                var psub3 = document.getElementById('pySubNav');
+                if (psub3) psub3.style.display = 'none';
+                var _tc2 = document.getElementById('tab-' + t);
+                if (_tc2) _tc2.classList.add('active');
             }
+            if (t === 'notes') { try{renderNotes()}catch(e){} }
+            if (t === 'ds') { try{dsRender()}catch(e){} }
+            if (t === 'todo') { try{renderTodos()}catch(e){} }
         });
     });
     function switchTab(name) {
+        if (name === 'cheatsheet') { javaView('cs'); return; }
+        if (name === 'vocab') { engView('vocab'); return; }
+        if (name === 'essays') { engView('essays'); return; }
+        if (name === 'python') { pyView('ex'); return; }
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelector('[data-tab="'+name+'"]').classList.add('active');
+        var _tb = document.querySelector('[data-tab="'+name+'"]');
+        if (_tb) _tb.classList.add('active');
+        var sub = document.getElementById('javaSubNav');
         window.curLang = (name === 'java' || name === 'c' || name === 'lanqiao') ? name : 'python';
-        if (name === 'java' || name === 'c' || name === 'lanqiao') {
+        var _exN = (name === 'python' || name === 'java' || name === 'c' || name === 'lanqiao');
+        if (_exN && window.exLang != null && window.exLang !== window.curLang) { try{cc=null;cd=null;}catch(e){} }
+        if (_exN) window.exLang = window.curLang;
+        if (name === 'eng') {
+            if (sub) sub.style.display = 'none';
+            var esub = document.getElementById('engSubNav');
+            if (esub) esub.style.display = 'flex';
+            var psubE = document.getElementById('pySubNav');
+            if (psubE) psubE.style.display = 'none';
+            engView('vocab');
+        } else if (name === 'java') {
+            if (sub) sub.style.display = 'flex';
+            var esub0 = document.getElementById('engSubNav');
+            if (esub0) esub0.style.display = 'none';
+            var psub0 = document.getElementById('pySubNav');
+            if (psub0) psub0.style.display = 'none';
+            javaView('ex');
+        } else if (name === 'c' || name === 'lanqiao') {
+            if (sub) sub.style.display = 'none';
+            var _esubS = document.getElementById('engSubNav');
+            if (_esubS) _esubS.style.display = 'none';
             document.getElementById('tab-python').classList.add('active');
-            if (name === 'java') { exercises = javaExercises; }
-            else if (name === 'c') { exercises = cExercises; }
+            if (name === 'c') { exercises = cExercises; }
             else { exercises = lanqiaoExercises; }
             if (name === 'lanqiao') { try{enterD('挑战')}catch(e){try{render()}catch(e){}} }
             else { try{render()}catch(e){} }
         } else {
-            document.getElementById('tab-'+name).classList.add('active');
-            if (name === 'python') { if(pyExercises && pyExercises.length > 0) { exercises = pyExercises; } try{render()}catch(e){} }
+            if (sub) sub.style.display = 'none';
+            var esub4 = document.getElementById('engSubNav');
+            if (esub4) esub4.style.display = 'none';
+            var psub4 = document.getElementById('pySubNav');
+            if (psub4) psub4.style.display = 'none';
+            var _tc = document.getElementById('tab-'+name);
+            if (_tc) _tc.classList.add('active');
+
         }
-        if (name === 'timer') document.getElementById('timerSection').style.display = 'block';
-        if (name === 'vocab') { vocabInfo(); vHome(); }
-        if (name === 'cheatsheet') { csRender(); }
+        if (name === 'timer') {
+            var _tt = document.getElementById('tab-tools');
+            if (_tt) _tt.classList.add('active');
+            var _ts = document.getElementById('timerSection');
+            if (_ts) _ts.style.display = 'block';
+        }
+        if (name === 'ds') { dsRender(); }
+        if (name === 'notes') { renderNotes(); }
+        if (name === 'todo') { renderTodos(); }
     }
     function resetGame() {
         if (confirm('确定要重置所有练习进度吗？')) {
@@ -551,18 +854,52 @@
         localStorage.setItem('theme', dark ? 'dark' : 'light');
         document.getElementById('themeToggle').textContent = dark ? '☀️' : '🌙';
     }
-    (function () {
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark');
-            var btn = document.getElementById('themeToggle');
-            if (btn) btn.textContent = '☀️';
-        }
-    })();
-renderNotes();
-    let timerInterval = null, timeLeft = 25*60, isRunning = false;
+    try {
+        (function () {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark');
+                var btn = document.getElementById('themeToggle');
+                if (btn) btn.textContent = '☀️';
+            }
+        })();
+    } catch (e) {}
+    try { renderNotes(); } catch (e) {}
+    let timerInterval = null, timeLeft = 25*60, isRunning = false, timerMin = 25;
     function updateTimerDisplay() {
         document.getElementById('timerDisplay').textContent =
             String(Math.floor(timeLeft/60)).padStart(2,'0') + ':' + String(timeLeft%60).padStart(2,'0');
+    }
+    function readTimerMin() {
+        var inp = document.getElementById('timerMin');
+        var v = inp ? parseInt(inp.value, 10) : timerMin;
+        if (isNaN(v) || v < 1) v = 1;
+        if (v > 120) v = 120;
+        if (inp && inp.value != v) inp.value = v;
+        return v;
+    }
+    function applyTimerMin() {
+        timerMin = readTimerMin();
+        timeLeft = timerMin * 60;
+        updateTimerDisplay();
+    }
+    function setTimerMin(m) {
+        var inp = document.getElementById('timerMin');
+        if (inp) inp.value = m;
+        timerMin = m;
+        if (!isRunning) {
+            timeLeft = m * 60;
+            updateTimerDisplay();
+            var btn = document.getElementById('timerBtn');
+            if (btn) btn.textContent = '▶ 开始';
+            var st = document.getElementById('timerStatus');
+            if (st) st.textContent = m + ' 分钟专注，点击开始';
+        }
+    }
+    function timerInput() {
+        if (isRunning) return;
+        timerMin = readTimerMin();
+        timeLeft = timerMin * 60;
+        updateTimerDisplay();
     }
     function toggleTimer() {
         const btn = document.getElementById('timerBtn');
@@ -570,24 +907,26 @@ renderNotes();
             clearInterval(timerInterval); isRunning = false;
             btn.textContent = '▶ 继续'; document.getElementById('timerStatus').textContent = '⏸ 已暂停';
         } else {
+            if (!timerInterval) applyTimerMin();
             isRunning = true; btn.textContent = '⏸ 暂停';
             document.getElementById('timerStatus').textContent = '🔥 专注学习中...';
             timerInterval = setInterval(() => {
                 timeLeft--; updateTimerDisplay();
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval); isRunning = false;
-                    btn.textContent = '▶ 开始'; timeLeft = 25*60; updateTimerDisplay();
+                    btn.textContent = '▶ 开始'; applyTimerMin();
                     document.getElementById('timerStatus').textContent = '🎉 时间到！休息一下吧';
                 }
             }, 1000);
         }
     }
     function resetTimer() {
-        clearInterval(timerInterval); isRunning = false; timeLeft = 25*60;
-        updateTimerDisplay(); document.getElementById('timerBtn').textContent = '▶ 开始';
+        clearInterval(timerInterval); isRunning = false; timerInterval = null;
+        applyTimerMin(); document.getElementById('timerBtn').textContent = '▶ 开始';
         document.getElementById('timerStatus').textContent = '点击开始专注学习';
     }
-    let todos = JSON.parse(localStorage.getItem('study_todos') || '[]');
+    let todos = [];
+    try { todos = JSON.parse(localStorage.getItem('study_todos') || '[]'); } catch (e) { todos = []; }
     function saveTodos() { localStorage.setItem('study_todos', JSON.stringify(todos)); }
     function addTodo() {
         const input = document.getElementById('todoInput'), text = input.value.trim();
@@ -607,7 +946,7 @@ renderNotes();
             +'</div>'
         ).join('');
     }
-    renderTodos();
+    try { renderTodos(); } catch (e) {}
 
     /* ===== 背单词（每日20词 + 打卡） ===== */
     var vWords = typeof vocabWords !== 'undefined' ? vocabWords : [];
@@ -1222,6 +1561,7 @@ renderNotes();
     var dsCur = 1;
     function dsChapter(id) {
         dsCur = id;
+        dsQuizCorrect = 0;
         var el = document.getElementById('dsArea');
         var c = dsData.find(function (x) { return x.id === id; });
         if (!c || !el) return;
@@ -1239,7 +1579,7 @@ renderNotes();
         }
         var p = dsProg['ch' + id] || { anim: false, sim: false, quiz: false, reviews: {} };
         dsProg['ch' + id] = p;
-        var html = '<div style="margin-bottom:12px"><button class="btn" style="background:#eef0f5" id="dsBackBtn">← 返回目录</button></div>'
+        var html = '<div style="margin-bottom:12px;display:flex;gap:8px"><button class="btn" style="background:#eef0f5" id="dsBackBtn">← 返回目录</button><button class="btn" style="background:#eef0f5" onclick="dsResetChapter()">🔄 重置本章</button></div>'
             + '<div class="note-card">'
             + '<h3 style="font-size:18px">第' + c.id + '章 · ' + c.icon + ' ' + c.title + '</h3>'
             + '<p style="font-size:13px;color:var(--text-mute);margin-bottom:8px">' + c.desc + '</p>'
@@ -1486,9 +1826,28 @@ renderNotes();
                 }
             });
             dsSave();
-            if (res) res.innerHTML = '<span style="color:#27ae60">🎉 通关！第2章已解锁，去看看吧！</span>';
-            setTimeout(function () { dsChapter(dsCur); }, 1500);
+            var next = dsData.find(function (x) { return x.id === dsCur + 1; });
+            if (res) {
+                if (next) {
+                    res.innerHTML = '<span style="color:#27ae60">🎉 通关！第' + (dsCur + 1) + '章已解锁</span>'
+                        + '<div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'
+                        + '<button class="btn btn-primary" style="margin:0" onclick="dsGoNext()">➡ 去第' + (dsCur + 1) + '章</button>'
+                        + '<button class="btn" style="background:#eef0f5;margin:0" onclick="dsList()">📋 返回目录</button></div>';
+                } else {
+                    res.innerHTML = '<span style="color:#27ae60">🎉 全部章节通关！太棒了！</span>'
+                        + '<div style="margin-top:10px"><button class="btn btn-primary" style="margin:0" onclick="dsList()">📋 返回目录</button></div>';
+                }
+            }
         }
+    }
+    function dsGoNext() {
+        if (dsCur < dsData.length) dsChapter(dsCur + 1);
+        window.scrollTo(0, 0);
+    }
+    function dsResetChapter() {
+        if (!confirm('确定重置第' + dsCur + '章的进度吗？动画/模拟/测验/复习都会清空。')) return;
+        dsProg['ch' + dsCur] = { anim: false, sim: false, quiz: false, reviews: {} };
+        dsSave(); dsInfo(); dsChapter(dsCur);
     }
 
     /* ---- 复习 ---- */
@@ -1542,7 +1901,8 @@ renderNotes();
         for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
         if (oi === r.answer) {
             btn.style.background = '#27ae60'; btn.style.color = '#fff';
-            msg.innerHTML = '<span style="color:#27ae60">✅ 复习完成！</span>';
+            msg.innerHTML = '<span style="color:#27ae60">✅ 复习完成！</span>'
+                + '<div style="margin-top:6px"><button class="btn" style="background:#eef0f5;font-size:12px;padding:4px 12px" onclick="dsList()">← 返回目录</button></div>';
             r.done = true; dsSave(); dsInfo();
         } else {
             btn.style.background = '#e74c3c'; btn.style.color = '#fff';
@@ -1556,6 +1916,52 @@ renderNotes();
             dsRender();
         }
     });
+
+
+    /* ===== Java 知识点地图 ===== */
+    function jsRender() {
+        var el = document.getElementById('jsArea');
+        if (!el) return;
+        var chapters = typeof javaKnowledge !== 'undefined' ? javaKnowledge : [];
+        var html = '<div style="animation:fadeIn 0.3s ease">'
+            + '<div style="text-align:center;padding:20px 10px 8px"><div style="font-size:40px">📖</div>'
+            + '<h2 style="font-size:20px;color:var(--text);margin:6px 0">Java 知识点地图</h2>'
+            + '<p style="font-size:13px;color:var(--text-mute)">共 ' + chapters.length + ' 章 · 做题卡住先查这里 · 点「去做题」直接巩固</p></div>';
+        chapters.forEach(function (c) {
+            html += '<div class="note-card" style="margin-bottom:10px">'
+                + '<div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="jsToggle(' + c.ch + ')">'
+                + '<span style="font-size:26px">' + c.icon + '</span>'
+                + '<div style="flex:1"><div style="font-size:15px;font-weight:600;color:var(--text)">第' + c.ch + '章 · ' + c.title + '</div>'
+                + '<div style="font-size:12px;color:var(--text-mute)">' + c.points.length + ' 个知识点 · 点击展开</div></div>'
+                + '<span id="jsArrow' + c.ch + '" style="color:#aaa;transition:transform 0.2s">▼</span></div>'
+                + '<div id="jsBody' + c.ch + '" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px">'
+                + c.points.map(function (p) {
+                    return '<div style="padding:8px 10px;background:#fafbfd;border-radius:8px;margin-bottom:6px">'
+                        + '<div style="font-size:13px;font-weight:600;color:var(--text)">📌 ' + esc(p.name) + '</div>'
+                        + '<div style="font-size:13px;color:var(--text-sub);margin-top:3px;line-height:1.7">' + esc(p.desc) + '</div>'
+                        + (p.tip ? '<div style="font-size:12px;color:#e67e22;margin-top:3px">💡 ' + esc(p.tip) + '</div>' : '')
+                        + (p.rel && p.rel.length ? '<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">'
+                            + p.rel.map(function (id) { var _seq = (typeof javaExercises !== 'undefined' && javaExercises.findIndex) ? javaExercises.findIndex(function (e) { return e.id === id; }) + 1 : id; return '<button class="btn" style="background:#eef1ff;color:#667eea;font-size:12px;padding:3px 10px;margin:0" onclick="javaGoQ(' + id + ')">去做题 #' + (('' + _seq).padStart(3, '0')) + '</button>'; }).join('')
+                            + '</div>' : '')
+                        + '</div>';
+                }).join('')
+                + '</div></div>';
+        });
+        html += '</div>';
+        el.innerHTML = html;
+    }
+    function jsToggle(ch) {
+        var b = document.getElementById('jsBody' + ch);
+        var a = document.getElementById('jsArrow' + ch);
+        if (!b) return;
+        var open = b.style.display !== 'none';
+        b.style.display = open ? 'none' : 'block';
+        if (a) a.style.transform = open ? '' : 'rotate(180deg)';
+    }
+    function javaGoQ(id) {
+        javaView('ex');
+        try { startC(id); } catch (e) { try { render(); } catch (e2) {} }
+    }
 
     /* ===== Java 速查手册 ===== */
     var csData = [
