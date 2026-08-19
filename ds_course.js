@@ -131,17 +131,17 @@ var dsChapters = [
    ]
   },
   "code": {
-   "title": "Java 代码实现",
+   "title": "C 代码实现",
    "blocks": [
     {
      "name": "数组基本操作",
-     "code": "public class ArrayBasics {\n    public static void main(String[] args) {\n        // 创建数组\n        int[] arr = {10, 20, 30, 40, 50};\n        // 访问：O(1)\n        System.out.println(\"arr[2] = \" + arr[2]);\n        // 遍历\n        for (int i = 0; i < arr.length; i++) {\n            System.out.print(arr[i] + \" \");\n        }\n        System.out.println();\n        // 尾部追加需要扩容（新建数组）\n        int[] bigger = new int[arr.length + 1];\n        System.arraycopy(arr, 0, bigger, 0, arr.length);\n        bigger[arr.length] = 60;\n        System.out.println(\"追加后长度: \" + bigger.length);\n    }\n}",
-     "notes": "逐段讲解：\n① 创建数组：int[] arr = {10,20,30,40,50}; 一次性初始化 5 个元素。\n② 访问 arr[2]：直接按下标取，输出 30，这就是 O(1) 访问。\n③ 遍历：for 循环从 0 到 arr.length-1 逐个输出，arr.length 是数组长度（5）。\n④ 尾部追加：数组长度是固定的，'追加'只能新建一个更大的数组，用 System.arraycopy 把旧元素拷过去，再把 60 放到最后。这一步要复制全部元素，所以是 O(n)。\n\n记忆点：数组按下标访问 O(1)，插入/删除/按值查找 O(n)。"
+     "code": "#include <stdio.h>\n#include <string.h>\n\nint main() {\n    // 创建数组\n    int arr[] = {10, 20, 30, 40, 50};\n    int n = 5;\n    // 访问：O(1)\n    printf(\"arr[2] = %d\\n\", arr[2]);\n    // 遍历\n    for (int i = 0; i < n; i++) {\n        printf(\"%d \", arr[i]);\n    }\n    printf(\"\\n\");\n    // 尾部追加需要扩容（新建更大的数组）\n    int bigger[6];\n    memcpy(bigger, arr, sizeof(arr));  // 拷贝旧元素\n    bigger[n] = 60;                    // 追加 60\n    n = 6;\n    printf(\"追加后长度: %d\\n\", n);\n    return 0;\n}",
+     "notes": "逐段讲解：\n① 创建数组：int arr[] = {10,20,30,40,50}; 一次性初始化 5 个元素，数组大小由编译器算好。\n② 访问 arr[2]：直接按下标取，输出 30，这就是 O(1) 访问。\n③ 遍历：for 循环从 0 到 n-1 逐个输出。C 数组没有 arr.length 这种属性，长度要自己用一个变量（n）记着。\n④ 尾部追加：数组长度固定，'追加'只能新建一个更大的数组，用 memcpy 把旧元素拷过去，再把 60 放到最后。这一步要复制全部元素，所以是 O(n)。\n\n记忆点：数组按下标访问 O(1)，插入/删除/按值查找 O(n)；C 数组长度要自己维护。"
     },
     {
-     "name": "字符串常用 API",
-     "code": "public class StringBasics {\n    public static void main(String[] args) {\n        String s = \"hello\";\n        System.out.println(\"长度: \" + s.length());          // 5\n        System.out.println(\"下标1: \" + s.charAt(1));         // e\n        System.out.println(\"子串: \" + s.substring(1, 3));    // el\n        System.out.println(\"转大写: \" + s.toUpperCase());     // HELLO\n        System.out.println(\"拼接: \" + s + \" world\");\n        // 频繁修改用 StringBuilder\n        StringBuilder sb = new StringBuilder();\n        sb.append(\"a\").append(\"b\").append(\"c\");\n        System.out.println(\"StringBuilder: \" + sb.toString()); // abc\n        sb.reverse();\n        System.out.println(\"反转: \" + sb.toString());          // cba\n    }\n}",
-     "notes": "逐段讲解：\n① s.length()：获取字符串长度（注意是方法，数组用 .length 属性，字符串用 .length() 方法）。\n② s.charAt(1)：取下标 1 的字符，'hello' 的下标 1 是 'e'。\n③ s.substring(1,3)：截取下标 1 到 2（不含 3），得到 'el'。\n④ toUpperCase()：转大写，字符串是不可变的，所以返回新字符串，原串不变。\n⑤ StringBuilder：字符串用 + 拼接每次都会创建新对象，频繁拼接很浪费；StringBuilder 是在原地修改，效率高。reverse() 反转，输出 cba。\n\n记忆点：字符串常用 charAt / substring / length / toUpperCase；频繁修改用 StringBuilder。"
+     "name": "字符串常用操作",
+     "code": "#include <stdio.h>\n#include <string.h>\n#include <ctype.h>\n\nint main() {\n    char s[] = \"hello\";\n    // 长度（不含结尾的 \\0）\n    printf(\"长度: %zu\\n\", strlen(s));          // 5\n    // 按下标取字符\n    printf(\"下标1: %c\\n\", s[1]);               // e\n    // 子串（拷到临时数组）\n    char sub[3] = {0};\n    strncpy(sub, s + 1, 2);                    // \"el\"\n    printf(\"子串: %s\\n\", sub);\n    // 转大写（逐个字符处理）\n    for (int i = 0; i < (int)strlen(s); i++) {\n        putchar(toupper(s[i]));\n    }\n    printf(\"\\n\");\n    // 拼接\n    char buf[32];\n    snprintf(buf, sizeof(buf), \"%s world\", s);\n    printf(\"拼接: %s\\n\", buf);\n    // 反转\n    for (int i = strlen(s) - 1; i >= 0; i--) {\n        putchar(s[i]);\n    }\n    printf(\"\\n\");\n    return 0;\n}",
+     "notes": "逐段讲解：\n① strlen(s)：获取字符串长度（不含结尾的 '\\0'）。C 字符串本质是 char 数组，以 '\\0' 结尾。\n② s[1]：按下标取字符，'hello' 的下标 1 是 'e'。C 字符串就是数组，直接按下标访问。\n③ 子串：strncpy(sub, s+1, 2) 从下标 1 开始拷 2 个字符得到 \"el\"。子串要自己开数组存，并保证有 '\\0' 结尾（{0} 初始化）。\n④ 转大写：toupper 来自 ctype.h，C 没有 toUpperCase() 方法，要循环处理每个字符。\n⑤ 拼接：snprintf 或 strcat 拼字符串。注意目标数组必须够大，否则越界——这是 C 里最常见的坑。\n\n记忆点：strlen 求长度、下标取字符、strncpy 取子串、toupper 转大写；C 字符串以 '\\0' 结尾，拼接要保证数组够大。"
     }
    ]
   },
@@ -155,7 +155,7 @@ var dsChapters = [
      "取决于数组类型"
     ],
     "answer": 0,
-    "explain": "Java 数组下标从 0 开始，第一个元素是 arr[0]"
+    "explain": "C 数组下标从 0 开始，第一个元素是 arr[0]"
    },
    {
     "q": "长度为 n 的数组，最后一个元素的下标是？",
@@ -191,7 +191,7 @@ var dsChapters = [
     "explain": "按下标访问是直接定位，O(1)；插入/删除要移动元素，查找要遍历，都是 O(n)"
    },
    {
-    "q": "String s = \"hello\"; s.charAt(1) 的结果是？",
+    "q": "char s[] = \"hello\"; s[1] 的结果是？",
     "options": [
      "h",
      "e",
@@ -199,7 +199,7 @@ var dsChapters = [
      "o"
     ],
     "answer": 1,
-    "explain": "charAt(1) 返回下标 1 的字符，hello 的下标 1 是 'e'"
+    "explain": "s[1] 返回下标 1 的字符，hello 的下标 1 是 'e'"
    }
   ],
   "review": [
@@ -216,12 +216,12 @@ var dsChapters = [
    },
    {
     "day": 3,
-    "q": "StringBuilder 相比 String 拼接的优势是？",
+    "q": "C 里用 strcat 反复拼接字符串要注意什么？",
     "options": [
-     "更快且不产生大量临时对象",
-     "支持下标访问",
-     "可以存储数字",
-     "没有优势"
+     "目标数组要够大，防止越界",
+     "会自动扩容",
+     "不需要 '\\0' 结尾",
+     "没有限制"
     ],
     "answer": 0
    },
@@ -318,12 +318,12 @@ var dsChapters = [
    ]
   },
   "code": {
-   "title": "Java 代码实现",
+   "title": "C 代码实现",
    "blocks": [
     {
      "name": "单链表的节点与操作",
-     "code": "class ListNode {\n    int val;\n    ListNode next;          // 指向下一个节点\n    ListNode(int val) {\n        this.val = val;\n    }\n}\n\npublic class LinkedListDemo {\n    public static void main(String[] args) {\n        // 创建链表: 10 -> 20 -> 30\n        ListNode head = new ListNode(10);\n        head.next = new ListNode(20);\n        head.next.next = new ListNode(30);\n        // 遍历: 从 head 顺着 next 走\n        ListNode cur = head;\n        while (cur != null) {\n            System.out.print(cur.val + \" \");\n            cur = cur.next;\n        }\n        System.out.println();\n        // 在 20 后面插入 25（只改两个指针）\n        ListNode node25 = new ListNode(25);\n        node25.next = head.next.next;   // 25 指向 30\n        head.next.next = node25;        // 20 指向 25\n        // 删除 25：20 直接指向 30\n        head.next.next = head.next.next.next;\n    }\n}",
-     "notes": "逐段讲解：\n① ListNode 类：val 存数据，next 存下一个节点的引用（指针）。构造方法只需 val，next 默认 null。\n② 创建链表：head.next = new ListNode(20) 让 10 指向 20；head.next.next = new ListNode(30) 让 20 指向 30。\n③ 遍历：cur 从 head 开始，每次输出 cur.val 然后 cur = cur.next 走到下一个，直到 null。\n④ 插入 25：node25.next = head.next.next（25 勾住 30），head.next.next = node25（20 改勾 25）。只改两个指针！\n⑤ 删除 25：head.next.next = head.next.next.next（20 直接勾 30，25 被跳过）。\n\n记忆点：链表插入/删除 O(1)（只改指针），访问/查找 O(n)（要挨个走）；数组正好相反。"
+     "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int val;\n    struct Node *next;   // 指向下一个节点\n} Node;\n\nNode *newNode(int val) {\n    Node *p = (Node *)malloc(sizeof(Node));\n    p->val = val;\n    p->next = NULL;\n    return p;\n}\n\nint main() {\n    // 创建链表: 10 -> 20 -> 30\n    Node *head = newNode(10);\n    head->next = newNode(20);\n    head->next->next = newNode(30);\n    // 遍历: 从 head 顺着 next 走\n    for (Node *cur = head; cur != NULL; cur = cur->next) {\n        printf(\"%d \", cur->val);\n    }\n    printf(\"\\n\");\n    // 在 20 后面插入 25（只改两个指针）\n    Node *n25 = newNode(25);\n    n25->next = head->next->next;  // 25 指向 30\n    head->next->next = n25;        // 20 指向 25\n    // 删除 25：20 直接指向 30\n    Node *tmp = head->next->next;  // 先存住 25，方便 free\n    head->next->next = head->next->next->next;\n    free(tmp);\n    return 0;\n}",
+     "notes": "逐段讲解：\n① Node 结构体：val 存数据，next 存下一个节点的指针。newNode 用 malloc 申请内存，并把 next 初始化为 NULL。\n② 创建链表：head->next = newNode(20) 让 10 指向 20；head->next->next = newNode(30) 让 20 指向 30。\n③ 遍历：cur 从 head 开始，每次输出 cur->val 然后 cur = cur->next 走到下一个，直到 NULL。\n④ 插入 25：n25->next = head->next->next（25 勾住 30），head->next->next = n25（20 改勾 25）。只改两个指针！\n⑤ 删除 25：head->next->next = head->next->next->next（20 直接勾 30，25 被跳过），C 里被删的节点要手动 free 释放内存。\n\n记忆点：链表插入/删除 O(1)（只改指针），访问/查找 O(n)（要挨个走）；数组正好相反。malloc 的节点用完要 free。"
     }
    ]
   },
@@ -493,17 +493,17 @@ var dsChapters = [
    ]
   },
   "code": {
-   "title": "Java 代码实现",
+   "title": "C 代码实现",
    "blocks": [
     {
-     "name": "栈：Deque/ArrayDeque 实现",
-     "code": "import java.util.ArrayDeque;\nimport java.util.Deque;\n\npublic class StackDemo {\n    public static void main(String[] args) {\n        Deque<Integer> stack = new ArrayDeque<>();\n        stack.push(5);        // 入栈\n        stack.push(8);\n        stack.push(3);\n        System.out.println(\"栈顶: \" + stack.peek());  // 3\n        int top = stack.pop();  // 出栈\n        System.out.println(\"弹出: \" + top);          // 3\n        System.out.println(\"栈是否空: \" + stack.isEmpty()); // false\n    }\n}",
-     "notes": "逐段讲解：\n① Java 里栈用 Deque（双端队列）+ ArrayDeque 实现，push 入栈、pop 出栈、peek 看栈顶、isEmpty 判空。\n② push(5)、push(8)、push(3)：3 最后进去，在栈顶。\n③ peek() 返回 3（只看不拿）。\n④ pop() 拿走 3（后进先出）。\n⑤ 空栈调用 pop() 会抛异常，所以用 isEmpty() 先判断。\n\n记忆点：栈 = 后进先出（LIFO），操作：push/pop/peek；浏览器后退、函数调用都用栈。"
+     "name": "栈：数组实现",
+     "code": "#include <stdio.h>\n#define MAX 100\n\nint stack[MAX];\nint top = -1;              // top 指向栈顶，-1 表示空栈\n\nvoid push(int x) { stack[++top] = x; }  // 入栈\nint pop(void) { return stack[top--]; }  // 出栈\nint peek(void) { return stack[top]; }   // 看栈顶\nint isEmpty(void) { return top == -1; } // 判空\n\nint main() {\n    push(5);    // 入栈\n    push(8);\n    push(3);\n    printf(\"栈顶: %d\\n\", peek());      // 3\n    int t = pop();                     // 出栈\n    printf(\"弹出: %d\\n\", t);          // 3\n    printf(\"栈是否空: %d\\n\", isEmpty());  // 0 (假)\n    return 0;\n}",
+     "notes": "逐段讲解：\n① C 里没有现成的栈，最常用数组模拟：top 记录栈顶下标，-1 表示空栈。\n② push(5)、push(8)、push(3)：3 最后进去，在栈顶。\n③ peek() 返回 3（只看不拿）。\n④ pop() 拿走 3（后进先出）。\n⑤ 空栈 pop 会越界，所以先 isEmpty() 判断；数组栈还要注意 top 到 MAX 就满了。\n\n记忆点：栈 = 后进先出（LIFO），数组模拟：push/pop/peek，top=-1 空栈；浏览器后退、函数调用都用栈。"
     },
     {
-     "name": "队列：LinkedList 实现",
-     "code": "import java.util.LinkedList;\nimport java.util.Queue;\n\npublic class QueueDemo {\n    public static void main(String[] args) {\n        Queue<String> queue = new LinkedList<>();\n        queue.offer(\"A\");   // 入队\n        queue.offer(\"B\");\n        queue.offer(\"C\");\n        System.out.println(\"队头: \" + queue.peek());  // A\n        String first = queue.poll();  // 出队\n        System.out.println(\"出队: \" + first);         // A\n        System.out.println(\"队列长度: \" + queue.size()); // 2\n    }\n}",
-     "notes": "逐段讲解：\n① 队列用 Queue 接口 + LinkedList 实现，offer 入队、poll 出队、peek 看队头、size 长度。\n② offer A、B、C：A 先进来，在队头。\n③ peek() 返回 A（队头是最先来的）。\n④ poll() 让 A 先离开（先进先出）。\n⑤ 剩下 B、C，长度 2。\n\n记忆点：队列 = 先进先出（FIFO），操作：offer/poll/peek；排队打印、消息队列都用队列。"
+     "name": "队列：数组实现",
+     "code": "#include <stdio.h>\n#define MAX 100\n\nint queue[MAX];\nint head = 0, tail = 0;   // head 队头，tail 下一个写入位置\n\nvoid enqueue(int x) { queue[tail++] = x; }  // 入队\nint dequeue(void) { return queue[head++]; } // 出队\nint front(void) { return queue[head]; }     // 看队头\nint size(void) { return tail - head; }      // 长度\n\nint main() {\n    enqueue(10);   // 入队\n    enqueue(20);\n    enqueue(30);\n    printf(\"队头: %d\\n\", front());      // 10\n    int first = dequeue();               // 出队\n    printf(\"出队: %d\\n\", first);        // 10\n    printf(\"队列长度: %d\\n\", size());   // 2\n    return 0;\n}",
+     "notes": "逐段讲解：\n① C 里队列也常用数组模拟：head 指向队头，tail 指向下一个写入位置，[head, tail) 就是队列内容。\n② 入队 10、20、30：10 先进来，在队头。\n③ front() 返回 10（队头是最先来的）。\n④ dequeue() 让 10 先离开（先进先出），head 往后移一位。\n⑤ 剩下 20、30，长度 = tail - head = 2。注意：head 只往后移，数组前面的空间就浪费了，工业级一般用循环队列（取模）复用空间。\n\n记忆点：队列 = 先进先出（FIFO），数组模拟：head/tail 双指针，入队 tail++、出队 head++；排队打印、消息队列都用队列。"
     }
    ]
   },
@@ -604,7 +604,7 @@ var dsChapters = [
   "id": 4,
   "title": "哈希表",
   "icon": "🗺️",
-  "desc": "HashMap/HashSet，O(1) 查找的神器。",
+  "desc": "哈希表/哈希集合，O(1) 查找的神器。",
   "intro": {
    "what": "哈希表是什么？",
    "text": "哈希表就像查字典：你不用从第一页翻起，而是按拼音/部首直接翻到那一页。哈希表用'哈希函数'把数据换算成一个位置，存的时候按位置放，找的时候按位置拿，一步到位。",
@@ -616,32 +616,32 @@ var dsChapters = [
    "steps": [
     {
      "op": "put",
-     "desc": "put(\"apple\", 5)：哈希函数算出位置1，存进去",
-     "detail": "存数据：key 是 apple，哈希函数把 apple 换算成下标 1（实际是 hashCode 取模），然后把 value 5 存到位置 1。key 相当于'标签'，value 是'内容'。",
+     "desc": "插入 apple→5：哈希函数算出位置1，存进去",
+     "detail": "存数据：key 是 apple，哈希函数把 apple 换算成下标 1（实际是哈希函数取模），然后把 value 5 存到位置 1。key 相当于'标签'，value 是'内容'。",
      "show": "位置: [0][1:apple→5][2][3][4]\n（哈希函数把apple算到位置1，存入5）"
     },
     {
      "op": "get",
-     "desc": "get(\"apple\")：同样算出位置1，直接取到5",
-     "detail": "取数据：get 时对 apple 再算一次哈希函数，得到同样的位置 1，直接去那里拿，得到 5。整个过程不依赖数据量大小，所以是 O(1)。这就是'查字典'的感觉——按拼音直接翻页。",
-     "show": "位置: [0][1:apple→5][2][3][4]\n（get(apple)算出位置1，直接取到5，O(1)）"
+     "desc": "查找 apple：同样算出位置1，直接取到5",
+     "detail": "查数据：对 apple 再算一次哈希函数，得到同样的位置 1，直接去那里拿，得到 5。整个过程不依赖数据量大小，所以是 O(1)。这就是'查字典'的感觉——按拼音直接翻页。",
+     "show": "位置: [0][1:apple→5][2][3][4]\n（查apple算出位置1，直接取到5，O(1)）"
     },
     {
      "op": "conflict",
-     "desc": "put(\"banana\",8)：也算到位置1，冲突了！",
+     "desc": "插入 banana→8：也算到位置1，冲突了！",
      "detail": "问题来了：banana 的哈希结果也是 1，和 apple 撞车了（哈希冲突）。解决办法：位置 1 挂一个链表，apple 和 banana 都挂在上面。查找时先到位置 1，再在链表里逐个找。",
      "show": "位置1: apple→5 → banana→8\n（banana也算到位置1，挂在apple后面的链表里）"
     },
     {
      "op": "get2",
-     "desc": "get(\"banana\")：位置1的链表里找到banana，得8",
-     "detail": "取 banana：算出位置 1，发现这里挂了个链表，在链表里找到 banana，得到 8。如果链表很短，查找依然很快；如果链表很长（很多冲突），就会变慢。Java 的 HashMap 在链表过长时会自动转成红黑树优化。",
-     "show": "位置1链表: apple→5 → ⭐banana→8⭐\n（get(banana)在位置1的链表里找到banana，得8）"
+     "desc": "查找 banana：位置1的链表里找到banana，得8",
+     "detail": "查 banana：算出位置 1，发现这里挂了个链表，在链表里找到 banana，得到 8。如果链表很短，查找依然很快；如果链表很长（很多冲突），就会变慢。所以哈希函数和桶的数量要设计好。",
+     "show": "位置1链表: apple→5 → ⭐banana→8⭐\n（查banana在位置1的链表里找到banana，得8）"
     }
    ]
   },
   "sim": {
-   "title": "动手模拟：HashMap 操作",
+   "title": "动手模拟：哈希表操作",
    "desc": "模拟 put 和 get，观察哈希函数和冲突",
    "init": [
     "空表：位置0-4"
@@ -649,48 +649,48 @@ var dsChapters = [
    "ops": [
     {
      "id": "put1",
-     "label": "put(\"a\",1)",
+     "label": "插入 a→1",
      "act": "put",
-     "explain": "put(\"a\",1)：哈希函数算出 a 的位置（比如 2），把 1 存到位置 2。key 是 a，value 是 1。"
+     "explain": "插入 a→1：哈希函数算出 a 的位置（比如 2），把 1 存到位置 2。key 是 a，value 是 1。"
     },
     {
      "id": "put2",
-     "label": "put(\"b\",2)",
+     "label": "插入 b→2",
      "act": "put",
-     "explain": "put(\"b\",2)：b 算出位置 4，存到位置 4。不同的 key 算出不同位置时，各存各的，互不干扰。"
+     "explain": "插入 b→2：b 算出位置 4，存到位置 4。不同的 key 算出不同位置时，各存各的，互不干扰。"
     },
     {
      "id": "get",
-     "label": "get(\"a\")",
+     "label": "查找 a",
      "act": "get",
-     "explain": "get(\"a\")：对 a 再算一次哈希，得到位置 2，直接取到 1。这就是 O(1) 查找——不用遍历所有数据！"
+     "explain": "查找 a：对 a 再算一次哈希，得到位置 2，直接取到 1。这就是 O(1) 查找——不用遍历所有数据！"
     },
     {
      "id": "conf",
-     "label": "put(\"c\",3) 冲突",
+     "label": "插入 c 冲突",
      "act": "conflict",
-     "explain": "冲突：c 也算到位置 2！和 a 撞车。位置 2 挂一个链表，a 和 c 都挂在上面。之后 get(\"c\") 要先到位置 2，再在链表里找 c。"
+     "explain": "冲突：c 也算到位置 2！和 a 撞车。位置 2 挂一个链表，a 和 c 都挂在上面。之后查 c 要先到位置 2，再在链表里找 c。"
     }
    ]
   },
   "code": {
-   "title": "Java 代码实现",
+   "title": "C 代码实现",
    "blocks": [
     {
-     "name": "HashMap 基本用法",
-     "code": "import java.util.HashMap;\nimport java.util.Map;\n\npublic class HashMapDemo {\n    public static void main(String[] args) {\n        Map<String, Integer> scores = new HashMap<>();\n        scores.put(\"张三\", 90);   // 存\n        scores.put(\"李四\", 85);\n        scores.put(\"张三\", 95);   // 覆盖：张三现在95\n        System.out.println(\"张三的成绩: \" + scores.get(\"张三\")); // 95\n        System.out.println(\"含李四: \" + scores.containsKey(\"李四\")); // true\n        System.out.println(\"大小: \" + scores.size());  // 2\n        // 遍历\n        for (Map.Entry<String, Integer> e : scores.entrySet()) {\n            System.out.println(e.getKey() + \"=\" + e.getValue());\n        }\n    }\n}",
-     "notes": "逐段讲解：\n① Map<K,V> 泛型：key 和 value 的类型。HashMap 是常用实现。\n② put(key, value)：存入；同一个 key 再次 put 会覆盖旧值（张三 90→95）。\n③ get(key)：按 key 取 value，O(1)。\n④ containsKey：判断有没有这个 key；size() 元素个数。\n⑤ 遍历：entrySet() 拿到所有键值对，e.getKey() / e.getValue()。\n\n记忆点：HashMap = 键值对，put/get/containsKey/size；查询 O(1)；key 不能重复，重复 put 覆盖。"
+     "name": "哈希表：链地址法实现",
+     "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\n#define SIZE 5   // 桶的数量\n\ntypedef struct KV {      // 键值对节点（挂在桶的链表上）\n    char *key;\n    int value;\n    struct KV *next;\n} KV;\n\nKV *table[SIZE];         // 桶数组\n\nint hash(char *key) {    // 简单哈希函数：ASCII 求和取模\n    int sum = 0;\n    for (int i = 0; key[i]; i++) sum += key[i];\n    return sum % SIZE;\n}\n\nvoid put(char *key, int value) {\n    int h = hash(key);\n    for (KV *p = table[h]; p; p = p->next) {  // 先找同 key\n        if (strcmp(p->key, key) == 0) {\n            p->value = value;   // 有则覆盖\n            return;\n        }\n    }\n    KV *n = (KV *)malloc(sizeof(KV));  // 没有则头插\n    n->key = key; n->value = value;\n    n->next = table[h];\n    table[h] = n;\n}\n\nint get(char *key) {     // 找不到返回 -1\n    int h = hash(key);\n    for (KV *p = table[h]; p; p = p->next) {\n        if (strcmp(p->key, key) == 0) return p->value;\n    }\n    return -1;\n}\n\nint main() {\n    put(\"张三\", 90);\n    put(\"李四\", 85);\n    put(\"张三\", 95);     // 覆盖：张三现在 95\n    printf(\"张三的成绩: %d\\n\", get(\"张三\"));  // 95\n    printf(\"李四的成绩: %d\\n\", get(\"李四\"));  // 85\n    printf(\"王五的成绩: %d\\n\", get(\"王五\"));  // -1（不存在）\n    return 0;\n}",
+     "notes": "逐段讲解：\n① C 没有现成的 HashMap，自己用\"桶数组 + 链表\"实现（链地址法）：SIZE 个桶，每个桶挂一条链表。\n② 哈希函数 hash()：把 key 各字符的 ASCII 码求和，再对桶数取模，算出该去哪个桶。C 里没有 hashCode()，哈希函数要自己写。\n③ put(key, value)：先算桶号，在桶的链表里找同 key——找到就覆盖旧值，找不到就头插一个新节点。\n④ get(key)：算桶号后在链表里找，找到返回值；找不到返回 -1（C 里没有 containsKey()，判断存在就是看 get 的结果）。\n⑤ 冲突：不同 key 落到同一桶，就挂在同一条链表上，查找时在链表里逐个 strcmp 比 key。链表很长时会变慢，所以哈希函数和桶的数量要设计好。\n\n记忆点：哈希表 = 桶数组 + 链表（链地址法），自己实现 put/get；查询平均 O(1)，冲突多时退化成 O(n)。"
     },
     {
-     "name": "HashSet 用法（去重神器）",
-     "code": "import java.util.HashSet;\nimport java.util.Set;\n\npublic class HashSetDemo {\n    public static void main(String[] args) {\n        Set<String> set = new HashSet<>();\n        set.add(\"apple\");\n        set.add(\"banana\");\n        set.add(\"apple\");   // 重复，不加入\n        System.out.println(\"大小: \" + set.size());  // 2\n        System.out.println(\"含apple: \" + set.contains(\"apple\")); // true\n        // 经典用法：去重\n        int[] nums = {1, 2, 2, 3, 3, 3};\n        Set<Integer> unique = new HashSet<>();\n        for (int n : nums) unique.add(n);\n        System.out.println(\"去重后数量: \" + unique.size()); // 3\n    }\n}",
-     "notes": "逐段讲解：\n① HashSet 存不重复的元素，add 重复元素会被忽略。\n② contains 判断是否存在，O(1)。\n③ 经典用法：遍历数组往 set 里 add，重复的自动被去掉，unique.size() 就是去重后的个数。\n\n记忆点：HashSet = 去重 + O(1) 判断存在；add/contains/size。蓝桥杯去重题首选。"
+     "name": "哈希集合：数组去重",
+     "code": "#include <stdio.h>\n#include <stdbool.h>\n\n#define SIZE 7\n\nbool set[SIZE];   // set[x]=true 表示数字 x 出现过\n\nint main() {\n    int nums[] = {1, 2, 2, 3, 3, 3};\n    int n = 6, cnt = 0;\n    for (int i = 0; i < n; i++) {\n        if (!set[nums[i]]) {     // 没出现过？\n            set[nums[i]] = true; // 标记出现过\n            cnt++;               // 去重后数量 +1\n        }\n    }\n    printf(\"去重后数量: %d\\n\", cnt);  // 3\n    return 0;\n}",
+     "notes": "逐段讲解：\n① 哈希集合的本质：只存 key 不存 value，用于 O(1) 判断\"存不存在\"。C 里没有现成的 Set，思路是把哈希表去掉 value 部分。\n② 这个例子用 bool 数组当集合：数字 1、2、3 直接当下标用（值域小的时候最简单），set[x]=true 表示 x 出现过。\n③ 经典用法：遍历数组，第一次遇到的数标记并计数，重复的跳过——cnt 就是去重后的个数。\n④ 值域大、或者数据是字符串时，就用前一个例子的链地址法：桶数组 + 链表，只存 key。\n\n记忆点：哈希集合 = 去重 + O(1) 判断存在；值域小用 bool 数组，值域大用链地址法。蓝桥杯去重题首选。"
     }
    ]
   },
   "quiz": [
    {
-    "q": "HashMap 的 get 操作时间复杂度是？",
+    "q": "哈希表查找的时间复杂度是？",
     "options": [
      "O(1)",
      "O(n)",
@@ -709,10 +709,10 @@ var dsChapters = [
      "数据丢失"
     ],
     "answer": 1,
-    "explain": "不同 key 的哈希结果相同，撞到同一个位置，就是冲突"
+    "explain": "不同 key 被哈希函数算到同一个位置，就叫哈希冲突，用链地址法（挂链表）解决"
    },
    {
-    "q": "HashMap 的 key 重复 put 会发生什么？",
+    "q": "哈希表里 key 重复插入会发生什么？",
     "options": [
      "报错",
      "覆盖旧值",
@@ -720,10 +720,10 @@ var dsChapters = [
      "随机选一个"
     ],
     "answer": 1,
-    "explain": "同一个 key 再次 put 会覆盖原来的 value"
+    "explain": "同一个 key 再次插入会覆盖原来的 value"
    },
    {
-    "q": "HashSet 最适合解决什么问题？",
+    "q": "哈希集合（去重表）最适合解决什么问题？",
     "options": [
      "排序",
      "去重",
@@ -731,18 +731,18 @@ var dsChapters = [
      "反转"
     ],
     "answer": 1,
-    "explain": "HashSet 自动去重，add 重复元素会被忽略"
+    "explain": "哈希集合自动去重，重复元素会被忽略"
    },
    {
-    "q": "HashMap 的遍历方式？",
+    "q": "哈希表的遍历方式？",
     "options": [
      "按索引for",
-     "entrySet() 拿键值对",
+     "遍历每个桶的链表拿键值对",
      "不能遍历",
      "按大小排序"
     ],
     "answer": 1,
-    "explain": "for (Map.Entry<K,V> e : map.entrySet()) 遍历键值对"
+    "explain": "遍历所有桶，每个桶的链表里挨个取键值对"
    }
   ],
   "review": [
@@ -759,9 +759,9 @@ var dsChapters = [
    },
    {
     "day": 3,
-    "q": "Java 里 HashMap 用什么方法判断 key 是否存在？",
+    "q": "哈希表里判断 key 是否存在通常怎么做？",
     "options": [
-     "containsKey",
+     "调用查找函数判断",
      "hasKey",
      "exist",
      "find"
@@ -773,7 +773,7 @@ var dsChapters = [
     "q": "蓝桥杯去重题首选什么结构？",
     "options": [
      "数组",
-     "HashSet",
+     "哈希集合",
      "栈",
      "队列"
     ],
@@ -855,12 +855,12 @@ var dsChapters = [
    ]
   },
   "code": {
-   "title": "Java 代码实现",
+   "title": "C 代码实现",
    "blocks": [
     {
      "name": "二叉树节点 + 三种遍历",
-     "code": "class TreeNode {\n    int val;\n    TreeNode left, right;\n    TreeNode(int val) { this.val = val; }\n}\n\npublic class TreeDemo {\n    static void preorder(TreeNode n) {\n        if (n == null) return;         // 空节点返回\n        System.out.print(n.val + \" \"); // 根\n        preorder(n.left);              // 左\n        preorder(n.right);             // 右\n    }\n    static void inorder(TreeNode n) {\n        if (n == null) return;\n        inorder(n.left);               // 左\n        System.out.print(n.val + \" \"); // 根\n        inorder(n.right);              // 右\n    }\n    static void postorder(TreeNode n) {\n        if (n == null) return;\n        postorder(n.left);             // 左\n        postorder(n.right);            // 右\n        System.out.print(n.val + \" \"); // 根\n    }\n    static int maxDepth(TreeNode n) {\n        if (n == null) return 0;\n        return 1 + Math.max(maxDepth(n.left), maxDepth(n.right));\n    }\n    public static void main(String[] args) {\n        TreeNode root = new TreeNode(1);\n        root.left = new TreeNode(2);\n        root.right = new TreeNode(3);\n        root.left.left = new TreeNode(4);\n        root.left.right = new TreeNode(5);\n        preorder(root);   // 1 2 4 5 3\n        inorder(root);    // 4 2 5 1 3\n        postorder(root);  // 4 5 2 3 1\n        System.out.println(\"深度: \" + maxDepth(root)); // 3\n    }\n}",
-     "notes": "逐段讲解：\n① TreeNode：val + left（左孩子）+ right（右孩子），构造方法只给 val。\n② 三种遍历结构几乎一样，区别只是'访问根'的位置：前序在最前、中序在中间、后序在最后。\n③ 递归出口：if (n == null) return; ——空节点什么都不做。这是所有树递归的'刹车'，防止无限递归。\n④ maxDepth：深度 = 1 + max(左深度, 右深度)，空节点深度 0。\n⑤ 构建树：root.left = new TreeNode(2) 就是给根挂左孩子。\n\n记忆点：遍历口诀——前序根在前、中序根居中、后序根在后；每棵子树都是一棵独立的树，递归处理。"
+     "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct TreeNode {\n    int val;\n    struct TreeNode *left, *right;\n} TreeNode;\n\nTreeNode *newNode(int val) {\n    TreeNode *p = (TreeNode *)malloc(sizeof(TreeNode));\n    p->val = val;\n    p->left = p->right = NULL;\n    return p;\n}\n\nvoid preorder(TreeNode *n) {\n    if (n == NULL) return;      // 空节点返回\n    printf(\"%d \", n->val);      // 根\n    preorder(n->left);          // 左\n    preorder(n->right);         // 右\n}\nvoid inorder(TreeNode *n) {\n    if (n == NULL) return;\n    inorder(n->left);           // 左\n    printf(\"%d \", n->val);      // 根\n    inorder(n->right);          // 右\n}\nvoid postorder(TreeNode *n) {\n    if (n == NULL) return;\n    postorder(n->left);         // 左\n    postorder(n->right);        // 右\n    printf(\"%d \", n->val);      // 根\n}\nint maxDepth(TreeNode *n) {\n    if (n == NULL) return 0;\n    int l = maxDepth(n->left), r = maxDepth(n->right);\n    return 1 + (l > r ? l : r);\n}\n\nint main() {\n    TreeNode *root = newNode(1);\n    root->left = newNode(2);\n    root->right = newNode(3);\n    root->left->left = newNode(4);\n    root->left->right = newNode(5);\n    preorder(root);   // 1 2 4 5 3\n    printf(\"\\n\");\n    inorder(root);    // 4 2 5 1 3\n    printf(\"\\n\");\n    postorder(root);  // 4 5 2 3 1\n    printf(\"\\n\");\n    printf(\"深度: %d\\n\", maxDepth(root));  // 3\n    return 0;\n}",
+     "notes": "逐段讲解：\n① TreeNode 结构体：val + left（左孩子指针）+ right（右孩子指针），newNode 用 malloc 建节点，左右指针初始化为 NULL。\n② 三种遍历结构几乎一样，区别只是'访问根'的位置：前序在最前、中序在中间、后序在最后。\n③ 递归出口：if (n == NULL) return; ——空节点什么都不做。这是所有树递归的'刹车'，防止无限递归。\n④ maxDepth：深度 = 1 + max(左深度, 右深度)，空节点深度 0。\n⑤ 构建树：root->left = newNode(2) 就是给根挂左孩子。\n\n记忆点：遍历口诀——前序根在前、中序根居中、后序根在后；每棵子树都是一棵独立的树，递归处理。"
     }
    ]
   },
@@ -1019,12 +1019,12 @@ var dsChapters = [
    ]
   },
   "code": {
-   "title": "Java 代码实现",
+   "title": "C 代码实现",
    "blocks": [
     {
-     "name": "邻接表 + DFS + BFS",
-     "code": "import java.util.*;\n\npublic class GraphDemo {\n    static List<List<Integer>> graph;\n    static boolean[] visited;\n\n    static void dfs(int node) {\n        visited[node] = true;\n        System.out.print(node + \" \");\n        for (int next : graph.get(node)) {\n            if (!visited[next]) dfs(next);\n        }\n    }\n\n    static void bfs(int start) {\n        Queue<Integer> queue = new LinkedList<>();\n        queue.offer(start);\n        visited[start] = true;\n        while (!queue.isEmpty()) {\n            int node = queue.poll();\n            System.out.print(node + \" \");\n            for (int next : graph.get(node)) {\n                if (!visited[next]) {\n                    visited[next] = true;\n                    queue.offer(next);\n                }\n            }\n        }\n    }\n\n    public static void main(String[] args) {\n        int n = 5;\n        graph = new ArrayList<>();\n        for (int i = 0; i < n; i++) graph.add(new ArrayList<>());\n        // 加边: 0-1, 0-2, 1-3, 2-3, 3-4\n        int[][] edges = {{0,1},{0,2},{1,3},{2,3},{3,4}};\n        for (int[] e : edges) {\n            graph.get(e[0]).add(e[1]);\n            graph.get(e[1]).add(e[0]);  // 无向图加双向\n        }\n        visited = new boolean[n];\n        System.out.print(\"DFS: \"); dfs(0);\n        System.out.println();\n        visited = new boolean[n];\n        System.out.print(\"BFS: \"); bfs(0);\n    }\n}",
-     "notes": "逐段讲解：\n① 邻接表：List<List<Integer>>，graph.get(i) 返回顶点 i 的所有邻居。\n② DFS：递归。访问当前点→标记visited→对每个没访问的邻居递归。'一条路走到黑'。\n③ BFS：队列。起点入队→循环：出队访问→没访问的邻居入队。'一圈圈扩散'。\n④ visited 数组：防止重复访问和死循环（无向图 0-1 会互相指向，不标记就死循环）。\n⑤ 加边：无向图要加双向（e[0]→e[1] 和 e[1]→e[0]）。\n\n记忆点：DFS用递归/栈（深），BFS用队列（广）；visited数组必须有；BFS能求最短步数。"
+     "name": "邻接矩阵 + DFS + BFS",
+     "code": "#include <stdio.h>\n#include <string.h>\n\n#define N 5       // 顶点数\n\nint graph[N][N];  // 邻接矩阵：graph[a][b]=1 表示 a、b 有边\nint visited[N];   // 访问标记\n\nvoid dfs(int node) {\n    visited[node] = 1;\n    printf(\"%d \", node);\n    for (int i = 0; i < N; i++) {\n        if (graph[node][i] && !visited[i]) dfs(i);\n    }\n}\n\nvoid bfs(int start) {\n    int queue[N * N], head = 0, tail = 0;  // 数组当队列\n    queue[tail++] = start;\n    visited[start] = 1;\n    while (head < tail) {\n        int node = queue[head++];\n        printf(\"%d \", node);\n        for (int i = 0; i < N; i++) {\n            if (graph[node][i] && !visited[i]) {\n                visited[i] = 1;\n                queue[tail++] = i;\n            }\n        }\n    }\n}\n\nint main() {\n    // 加边: 0-1, 0-2, 1-3, 2-3, 3-4\n    int edges[][2] = {{0,1},{0,2},{1,3},{2,3},{3,4}};\n    for (int i = 0; i < 5; i++) {\n        int a = edges[i][0], b = edges[i][1];\n        graph[a][b] = 1;\n        graph[b][a] = 1;   // 无向图加双向\n    }\n    memset(visited, 0, sizeof(visited));\n    printf(\"DFS: \"); dfs(0);\n    printf(\"\\n\");\n    memset(visited, 0, sizeof(visited));\n    printf(\"BFS: \"); bfs(0);\n    printf(\"\\n\");\n    return 0;\n}",
+     "notes": "逐段讲解：\n① 图的存储：C 常用邻接矩阵（graph[a][b]=1 表示 a、b 有边）或邻接表（每个顶点一条链表存邻居）。顶点少、边密用矩阵，数据量大用邻接表。\n② DFS：递归。访问当前点→标记visited→对每个没访问的邻居递归。'一条路走到黑'。\n③ BFS：数组当队列用。起点入队→循环：出队访问→没访问的邻居入队。'一圈圈扩散'。\n④ visited 数组：防止重复访问和死循环（无向图 0-1 会互相指向，不标记就死循环）。每次搜索前用 memset 清零。\n⑤ 加边：无向图要加双向（graph[a][b] 和 graph[b][a] 都置 1）。\n\n记忆点：DFS用递归/栈（深），BFS用队列（广）；visited数组必须有；BFS能求最短步数。"
     }
    ]
   },
@@ -1183,16 +1183,16 @@ var dsChapters = [
    ]
   },
   "code": {
-   "title": "Java 代码实现",
+   "title": "C 代码实现",
    "blocks": [
     {
      "name": "快速排序（高频考点）",
-     "code": "import java.util.Arrays;\n\npublic class QuickSortDemo {\n    static void quickSort(int[] arr, int low, int high) {\n        if (low >= high) return;  // 递归出口\n        int pivot = arr[low];     // 选基准\n        int i = low, j = high;\n        while (i < j) {\n            while (i < j && arr[j] >= pivot) j--;  // 右边找小的\n            arr[i] = arr[j];\n            while (i < j && arr[i] <= pivot) i++;  // 左边找大的\n            arr[j] = arr[i];\n        }\n        arr[i] = pivot;          // 基准归位\n        quickSort(arr, low, i - 1);   // 左递归\n        quickSort(arr, i + 1, high);  // 右递归\n    }\n    public static void main(String[] args) {\n        int[] nums = {5, 3, 8, 1, 9, 2};\n        quickSort(nums, 0, nums.length - 1);\n        System.out.println(Arrays.toString(nums));\n    }\n}",
+     "code": "#include <stdio.h>\n\nvoid quickSort(int arr[], int low, int high) {\n    if (low >= high) return;       // 递归出口\n    int pivot = arr[low];          // 选基准（最左元素）\n    int i = low, j = high;\n    while (i < j) {\n        while (i < j && arr[j] >= pivot) j--;  // 右边找小的\n        arr[i] = arr[j];\n        while (i < j && arr[i] <= pivot) i++;  // 左边找大的\n        arr[j] = arr[i];\n    }\n    arr[i] = pivot;                // 基准归位\n    quickSort(arr, low, i - 1);    // 左递归\n    quickSort(arr, i + 1, high);   // 右递归\n}\n\nint main() {\n    int nums[] = {5, 3, 8, 1, 9, 2};\n    int n = sizeof(nums) / sizeof(nums[0]);\n    quickSort(nums, 0, n - 1);\n    for (int i = 0; i < n; i++) printf(\"%d \", nums[i]);\n    printf(\"\\n\");\n    return 0;\n}",
      "notes": "逐段讲解：\n① 递归出口：low >= high 表示只剩0或1个元素，天然有序。\n② 选基准 pivot = arr[low]（最左元素）。\n③ 双指针：j 从右往左找比基准小的，i 从左往右找比基准大的，交换填坑。\n④ 循环结束 i==j，基准归位到 arr[i]——此时左边都比它小，右边都比它大。\n⑤ 对左半和右半递归。\n\n记忆点：快排 = 选基准 + 分区（小左大右）+ 递归。平均 O(nlogn)。背下这个模板，蓝桥杯排序题稳了。"
     },
     {
      "name": "归并排序（稳定版）",
-     "code": "import java.util.Arrays;\n\npublic class MergeSortDemo {\n    static void mergeSort(int[] arr, int left, int right) {\n        if (left >= right) return;\n        int mid = (left + right) / 2;\n        mergeSort(arr, left, mid);        // 拆左\n        mergeSort(arr, mid + 1, right);   // 拆右\n        merge(arr, left, mid, right);     // 合并\n    }\n    static void merge(int[] arr, int left, int mid, int right) {\n        int[] temp = new int[right - left + 1];\n        int i = left, j = mid + 1, k = 0;\n        while (i <= mid && j <= right) {\n            if (arr[i] <= arr[j]) temp[k++] = arr[i++];\n            else temp[k++] = arr[j++];\n        }\n        while (i <= mid) temp[k++] = arr[i++];\n        while (j <= right) temp[k++] = arr[j++];\n        for (int m = 0; m < temp.length; m++) arr[left + m] = temp[m];\n    }\n    public static void main(String[] args) {\n        int[] nums = {5, 3, 8, 1, 9, 2};\n        mergeSort(nums, 0, nums.length - 1);\n        System.out.println(Arrays.toString(nums));\n    }\n}",
+     "code": "#include <stdio.h>\n\nint temp[100];   // 合并用的临时数组\n\nvoid merge(int arr[], int left, int mid, int right) {\n    int i = left, j = mid + 1, k = 0;\n    while (i <= mid && j <= right) {\n        if (arr[i] <= arr[j]) temp[k++] = arr[i++];\n        else temp[k++] = arr[j++];\n    }\n    while (i <= mid) temp[k++] = arr[i++];\n    while (j <= right) temp[k++] = arr[j++];\n    for (int m = 0; m < k; m++) arr[left + m] = temp[m];\n}\n\nvoid mergeSort(int arr[], int left, int right) {\n    if (left >= right) return;\n    int mid = (left + right) / 2;\n    mergeSort(arr, left, mid);        // 拆左\n    mergeSort(arr, mid + 1, right);   // 拆右\n    merge(arr, left, mid, right);     // 合并\n}\n\nint main() {\n    int nums[] = {5, 3, 8, 1, 9, 2};\n    int n = sizeof(nums) / sizeof(nums[0]);\n    mergeSort(nums, 0, n - 1);\n    for (int i = 0; i < n; i++) printf(\"%d \", nums[i]);\n    printf(\"\\n\");\n    return 0;\n}",
      "notes": "逐段讲解：\n① mergeSort：拆！mid 取中间，递归拆左、拆右。\n② merge：合！两个有序子数组合并：i 指左半、j 指右半，谁小谁进 temp。\n③ 收尾：左半或右半有剩余的全部拷进 temp。\n④ 把 temp 拷回原数组对应位置。\n⑤ 关键：合并时 arr[i] <= arr[j] 取左边（相等时左边先），所以是稳定的。\n\n记忆点：归并 = 拆到单个 + 合并有序。稳定 O(nlogn)，需 O(n) 额外空间。求'逆序对'数量就用归并。"
     }
    ]
@@ -1364,17 +1364,17 @@ var dsChapters = [
    ]
   },
   "code": {
-   "title": "Java 代码实现",
+   "title": "C 代码实现",
    "blocks": [
     {
      "name": "二分查找（背模板）",
-     "code": "public class BinarySearchDemo {\n    // 在有序数组里找 target，找到返回下标，找不到返回-1\n    static int binarySearch(int[] arr, int target) {\n        int left = 0, right = arr.length - 1;\n        while (left <= right) {\n            int mid = left + (right - left) / 2;  // 防溢出写法\n            if (arr[mid] == target) return mid;\n            else if (arr[mid] < target) left = mid + 1;\n            else right = mid - 1;\n        }\n        return -1;\n    }\n    public static void main(String[] args) {\n        int[] arr = {1, 3, 5, 7, 9, 11, 13};\n        System.out.println(\"7的位置: \" + binarySearch(arr, 7));   // 3\n        System.out.println(\"4的位置: \" + binarySearch(arr, 4));   // -1\n    }\n}",
-     "notes": "逐段讲解：\n① 前提：数组必须有序（从小到大）。\n② 左右指针：left 指向第一个，right 指向最后一个。\n③ 循环条件 left <= right：范围内还有元素就继续。\n④ mid 用 left + (right-left)/2 而不是 (left+right)/2，防止 left+right 溢出（数据大时）。\n⑤ 三路判断：等于→返回；小于→左边找（right=mid-1）；大于→右边找（left=mid+1）。\n⑥ 循环结束没找到返回 -1。\n\n记忆点：二分 = 有序 + 每次砍一半 + O(logn)。模板背下来，蓝桥杯查找题直接套。也可用 Arrays.binarySearch(arr, target) 一行搞定。"
+     "code": "#include <stdio.h>\n\n// 在有序数组里找 target，找到返回下标，找不到返回 -1\nint binarySearch(int arr[], int n, int target) {\n    int left = 0, right = n - 1;\n    while (left <= right) {\n        int mid = left + (right - left) / 2;  // 防溢出写法\n        if (arr[mid] == target) return mid;\n        else if (arr[mid] < target) left = mid + 1;\n        else right = mid - 1;\n    }\n    return -1;\n}\n\nint main() {\n    int arr[] = {1, 3, 5, 7, 9, 11, 13};\n    int n = sizeof(arr) / sizeof(arr[0]);\n    printf(\"7的位置: %d\\n\", binarySearch(arr, n, 7));   // 3\n    printf(\"4的位置: %d\\n\", binarySearch(arr, n, 4));   // -1\n    return 0;\n}",
+     "notes": "逐段讲解：\n① 前提：数组必须有序（从小到大）。\n② 左右指针：left 指向第一个，right 指向最后一个。\n③ 循环条件 left <= right：范围内还有元素就继续。\n④ mid 用 left + (right-left)/2 而不是 (left+right)/2，防止 left+right 溢出（数据大时）。\n⑤ 三路判断：等于→返回；小于→左边找（right=mid-1）；大于→右边找（left=mid+1）。\n⑥ 循环结束没找到返回 -1。\n\n记忆点：二分 = 有序 + 每次砍一半 + O(logn)。模板背下来，蓝桥杯查找题直接套。"
     },
     {
-     "name": "Arrays.binarySearch 一行版",
-     "code": "import java.util.Arrays;\n\npublic class ArraysSearchDemo {\n    public static void main(String[] args) {\n        int[] arr = {1, 3, 5, 7, 9, 11, 13};\n        // 找到返回下标\n        int idx = Arrays.binarySearch(arr, 7);\n        System.out.println(\"7的位置: \" + idx);  // 3\n        // 找不到返回负的插入点-1\n        int idx2 = Arrays.binarySearch(arr, 4);\n        System.out.println(\"4: \" + idx2);  // -3 (应插入在下标2, 返回-(2+1))\n        // 注意：必须先排序再二分\n        int[] unsorted = {9, 3, 7};\n        Arrays.sort(unsorted);\n        System.out.println(Arrays.toString(unsorted)); // [3,7,9]\n    }\n}",
-     "notes": "逐段讲解：\n① Arrays.binarySearch(数组, 目标)：官方二分查找，找到返回下标。\n② 找不到返回负数：-(插入点+1)。比如4应插在下标2，返回-(2+1)=-3。\n③ 必须有序！对无序数组用 Arrays.sort() 先排序。\n\n记忆点：比赛里 Arrays.binarySearch 和 Arrays.sort 是神器，但别忘了先排序。"
+     "name": "bsearch 一行版（C 标准库）",
+     "code": "#include <stdio.h>\n#include <stdlib.h>\n\n// 比较函数：告诉 bsearch / qsort 怎么比大小\nint cmp(const void *a, const void *b) {\n    return *(int *)a - *(int *)b;\n}\n\nint main() {\n    int arr[] = {1, 3, 5, 7, 9, 11, 13};\n    int n = sizeof(arr) / sizeof(arr[0]);\n    int target = 7;\n    // 找到返回指针，找不到返回 NULL\n    int *p = (int *)bsearch(&target, arr, n, sizeof(int), cmp);\n    if (p != NULL) printf(\"7的位置: %ld\\n\", p - arr);  // 3\n    else printf(\"没找到\\n\");\n    // 无序数组先排序：qsort\n    int nums[] = {9, 3, 7};\n    qsort(nums, 3, sizeof(int), cmp);\n    for (int i = 0; i < 3; i++) printf(\"%d \", nums[i]);\n    printf(\"\\n\");  // 3 7 9\n    return 0;\n}",
+     "notes": "逐段讲解：\n① bsearch(要查的值, 数组, 元素个数, 每个元素大小, 比较函数)：C 标准库的二分查找，找到返回指针，找不到返回 NULL。\n② 比较函数 cmp 告诉 bsearch 怎么比大小：返回负数 / 0 / 正数，表示 a<b / a==b / a>b。\n③ 位置 = 返回的指针 - 数组首地址（p - arr）。\n④ 必须有序！对无序数组用 qsort 先排序（qsort 也是标准库快排，同样要传 cmp）。\n⑤ 注意 bsearch 返回的是 void*，要用 (int*) 转成 int 指针再用。\n\n记忆点：比赛里 bsearch 和 qsort 是神器，但都要写 cmp 比较函数，而且别忘了先排序。"
     }
    ]
   },
@@ -1421,7 +1421,7 @@ var dsChapters = [
      "null"
     ],
     "answer": 1,
-    "explain": "手写版返回-1；Arrays.binarySearch返回-(插入点+1)"
+    "explain": "手写版返回 -1；C 标准库 bsearch 找不到返回 NULL"
    },
    {
     "q": "mid = left + (right-left)/2 这样写的好处是？",
@@ -1545,17 +1545,17 @@ var dsChapters = [
    ]
   },
   "code": {
-   "title": "Java 代码实现",
+   "title": "C 代码实现",
    "blocks": [
     {
      "name": "爬楼梯（经典DP入门）",
-     "code": "public class ClimbStairsDemo {\n    // 每次爬1或2阶，到第n阶有多少种方法\n    static int climbStairs(int n) {\n        if (n <= 2) return n;\n        int[] dp = new int[n + 1];\n        dp[1] = 1;   // 边界\n        dp[2] = 2;   // 边界\n        for (int i = 3; i <= n; i++) {\n            dp[i] = dp[i - 1] + dp[i - 2];  // 状态转移\n        }\n        return dp[n];\n    }\n    public static void main(String[] args) {\n        System.out.println(\"5阶: \" + climbStairs(5));   // 8\n        System.out.println(\"10阶: \" + climbStairs(10));  // 89\n    }\n}",
+     "code": "#include <stdio.h>\n\n// 每次爬1或2阶，到第n阶有多少种方法\nint climbStairs(int n) {\n    if (n <= 2) return n;\n    int dp[100] = {0};\n    dp[1] = 1;   // 边界\n    dp[2] = 2;   // 边界\n    for (int i = 3; i <= n; i++) {\n        dp[i] = dp[i - 1] + dp[i - 2];  // 状态转移\n    }\n    return dp[n];\n}\n\nint main() {\n    printf(\"5阶: %d\\n\", climbStairs(5));    // 8\n    printf(\"10阶: %d\\n\", climbStairs(10));  // 89\n    return 0;\n}",
      "notes": "逐段讲解：\n① 状态定义：dp[i] = 爬到第 i 阶的方法数。\n② 边界：dp[1]=1（爬1阶），dp[2]=2（1+1 或 2）。\n③ 状态转移方程：dp[i] = dp[i-1] + dp[i-2]（最后一步从 i-1 爬1阶 或 从 i-2 爬2阶）。\n④ 循环从 3 到 n 填表，每个值只算一次。\n⑤ 空间还能优化：只用两个变量滚动（因为只依赖前两个），但数组版更好理解。\n\n记忆点：DP 三步——定义dp、找转移方程、定边界。爬楼梯 = 斐波那契，是 DP 的'Hello World'。"
     },
     {
      "name": "斐波那契 DP 版",
-     "code": "public class FibonacciDpDemo {\n    // 求第n个斐波那契数: f(0)=0, f(1)=1, f(n)=f(n-1)+f(n-2)\n    static int fib(int n) {\n        if (n <= 1) return n;\n        int[] dp = new int[n + 1];\n        dp[0] = 0;\n        dp[1] = 1;\n        for (int i = 2; i <= n; i++) {\n            dp[i] = dp[i - 1] + dp[i - 2];\n        }\n        return dp[n];\n    }\n    public static void main(String[] args) {\n        System.out.println(\"fib(10) = \" + fib(10));   // 55\n        System.out.println(\"fib(20) = \" + fib(20));   // 6765\n    }\n}",
-     "notes": "逐段讲解：\n① 状态：dp[i] = 第 i 个斐波那契数。\n② 边界：dp[0]=0，dp[1]=1。\n③ 转移：dp[i] = dp[i-1] + dp[i-2]。\n④ 对比递归版：递归 f(20) 要算 1 万多次，DP 只要 20 次。这就是'记住结果'的威力。\n⑤ 蓝桥杯常见变体：斐波那契 + 大数（用 BigInteger），因为第 100 项就超出 int 范围了。\n\n记忆点：递归（自顶向下，重复算）vs DP（自底向上，存结果）。看到'f(n)=f(n-1)+f(n-2)'这类递推，就用 DP。"
+     "code": "#include <stdio.h>\n\n// 求第n个斐波那契数: f(0)=0, f(1)=1, f(n)=f(n-1)+f(n-2)\nint fib(int n) {\n    if (n <= 1) return n;\n    int dp[100] = {0};\n    dp[0] = 0;\n    dp[1] = 1;\n    for (int i = 2; i <= n; i++) {\n        dp[i] = dp[i - 1] + dp[i - 2];\n    }\n    return dp[n];\n}\n\nint main() {\n    printf(\"fib(10) = %d\\n\", fib(10));  // 55\n    printf(\"fib(20) = %d\\n\", fib(20));  // 6765\n    return 0;\n}",
+     "notes": "逐段讲解：\n① 状态：dp[i] = 第 i 个斐波那契数。\n② 边界：dp[0]=0，dp[1]=1。\n③ 转移：dp[i] = dp[i-1] + dp[i-2]。\n④ 对比递归版：递归 f(20) 要算 1 万多次，DP 只要 20 次。这就是'记住结果'的威力。\n⑤ 蓝桥杯常见变体：斐波那契 + 大数。第 47 项就超出 int 范围了，C 里要用 long long 或高精度数组。\n\n记忆点：递归（自顶向下，重复算）vs DP（自底向上，存结果）。看到'f(n)=f(n-1)+f(n-2)'这类递推，就用 DP。"
     }
    ]
   },
